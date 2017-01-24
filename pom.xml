@@ -39,5 +39,10 @@
 	  <artifactId>refext</artifactId>
 	  <version>977651d5ce</version>
 	</dependency>
+	<dependency>
+      <groupId>com.cybozu.labs</groupId>
+      <artifactId>langdetect</artifactId>
+      <version>1.1-20120112</version>
+    </dependency>
   </dependencies>
 </project>
