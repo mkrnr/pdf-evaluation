@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
+
 import de.exciteproject.refext.util.FileUtils;
 
 /**
@@ -23,8 +25,10 @@ public class RandomFileListGenerator {
 
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile));
         for (File file : randomlySortedFiles) {
-            bufferedWriter.write(file.getAbsolutePath().replaceAll(inputDirectory.getAbsolutePath() + "/", ""));
-            bufferedWriter.newLine();
+            if (FilenameUtils.getExtension(file.getName()).toLowerCase().equals("pdf")) {
+                bufferedWriter.write(file.getAbsolutePath().replaceAll(inputDirectory.getAbsolutePath() + "/", ""));
+                bufferedWriter.newLine();
+            }
         }
         bufferedWriter.close();
 
