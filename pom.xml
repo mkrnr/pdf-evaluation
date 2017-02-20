@@ -37,12 +37,22 @@
     <dependency>
 	  <groupId>com.github.exciteproject</groupId>
 	  <artifactId>refext</artifactId>
-	  <version>977651d5ce</version>
+	  <version>6346be567f</version>
 	</dependency>
 	<dependency>
       <groupId>com.cybozu.labs</groupId>
       <artifactId>langdetect</artifactId>
       <version>1.1-20120112</version>
+    </dependency>
+    <dependency>
+      <groupId>info.debatty</groupId>
+      <artifactId>java-string-similarity</artifactId>
+      <version>RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.grobid</groupId>
+      <artifactId>grobid-core</artifactId>
+      <version>0.4.2-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

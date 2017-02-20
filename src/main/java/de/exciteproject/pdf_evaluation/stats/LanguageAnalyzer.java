@@ -83,15 +83,16 @@ public class LanguageAnalyzer {
 
         // Map<String, Integer> languageMap = new HashMap<String, Integer>();
 
-        for (int i = 1; i <= inputDirectory.listFiles().length; i++) {
-            File inputFile = new File(inputDirectory.getAbsolutePath() + File.separator + i + ".pdf");
+        for (File inputFile : inputDirectory.listFiles()) {
             Detector detector = DetectorFactory.create();
             detector.append(FileUtils.readFile(inputFile));
             try {
                 // MapUtils.addCount(languageMap, detector.detect());
+                // System.out.println(inputFile);
                 System.out.println(detector.detect());
             } catch (LangDetectException e) {
                 // MapUtils.addCount(languageMap, "unknown");
+                System.out.println(inputFile);
                 System.out.println("unknown");
             }
 

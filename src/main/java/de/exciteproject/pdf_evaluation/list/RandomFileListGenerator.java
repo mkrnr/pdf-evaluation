@@ -20,12 +20,13 @@ public class RandomFileListGenerator {
     public static void main(String[] args) throws IOException {
         File inputDirectory = new File(args[0]);
         File outputFile = new File(args[1]);
+        String fileExtension = args[2];
         List<File> randomlySortedFiles = RandomFileListGenerator.randomlySelectFiles(inputDirectory, Integer.MAX_VALUE,
                 new ArrayList<File>());
 
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile));
         for (File file : randomlySortedFiles) {
-            if (FilenameUtils.getExtension(file.getName()).toLowerCase().equals("pdf")) {
+            if (FilenameUtils.getExtension(file.getName()).toLowerCase().equals(fileExtension)) {
                 bufferedWriter.write(file.getAbsolutePath().replaceAll(inputDirectory.getAbsolutePath() + "/", ""));
                 bufferedWriter.newLine();
             }
