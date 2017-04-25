@@ -37,7 +37,7 @@
     <dependency>
 	  <groupId>com.github.exciteproject</groupId>
 	  <artifactId>refext</artifactId>
-	  <version>6346be567f</version>
+	  <version>dd1f2774fe</version>
 	</dependency>
 	<dependency>
       <groupId>com.cybozu.labs</groupId>
@@ -49,10 +49,10 @@
       <artifactId>java-string-similarity</artifactId>
       <version>RELEASE</version>
     </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>org.grobid</groupId>
       <artifactId>grobid-core</artifactId>
       <version>0.4.2-SNAPSHOT</version>
-    </dependency>-->
+    </dependency>
   </dependencies>
 </project>
