@@ -33,8 +33,8 @@ public class GrobidTrainKFoldBuilder extends KFoldBuilder {
 
         this.buildTrainingDirectory(i, new File(sourceDirectory + File.separator + "segmentation"),
                 new File(targetDirectory + File.separator + "segmentation"));
-        this.buildTrainingDirectory(i, new File(sourceDirectory + File.separator + "reference-segmentation"),
-                new File(targetDirectory + File.separator + "reference-segmentation"));
+        this.buildTrainingDirectory(i, new File(sourceDirectory + File.separator + "reference-segmenter"),
+                new File(targetDirectory + File.separator + "reference-segmenter"));
 
     }
 

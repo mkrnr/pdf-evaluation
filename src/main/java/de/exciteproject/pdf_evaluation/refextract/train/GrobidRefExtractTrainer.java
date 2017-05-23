@@ -54,21 +54,19 @@ public class GrobidRefExtractTrainer extends RefExtractTrainer {
     private void copyTrainingFiles(File trainingFilesDirectory) throws IOException {
         File datasetDirectory = new File(this.grobidHomeDirectory.getParentFile() + File.separator + "grobid-trainer"
                 + File.separator + "resources" + File.separator + "dataset");
-        File segmentationCorpusDirectory = new File(
-                datasetDirectory + File.separator + "segmentation" + File.separator + "corpus");
 
-        // this "reference-segmenter" is the default folder of grobid....
-        File referenceSegmentationCorpusDirectory = new File(
-                datasetDirectory + File.separator + "reference-segmenter" + File.separator + "corpus");
+        String[] modelDirectoryNames = { "segmentation", "reference-segmenter" };
 
-        File segmentationTrainingDirectory = new File(trainingFilesDirectory + File.separator + "segmentation");
-        File referenceSegmentationTrainingDirectory = new File(
-                trainingFilesDirectory + File.separator + "reference-segmentation");
+        for (String modelDirectoryName : modelDirectoryNames) {
 
-        this.copySubFolder(segmentationTrainingDirectory, segmentationCorpusDirectory, "raw");
-        this.copySubFolder(segmentationTrainingDirectory, segmentationCorpusDirectory, "tei");
-        this.copySubFolder(referenceSegmentationTrainingDirectory, referenceSegmentationCorpusDirectory, "raw");
-        this.copySubFolder(referenceSegmentationTrainingDirectory, referenceSegmentationCorpusDirectory, "tei");
+            File currentCorpusDirectory = new File(
+                    datasetDirectory + File.separator + modelDirectoryName + File.separator + "corpus");
+
+            File currentTrainingDirectory = new File(trainingFilesDirectory + File.separator + modelDirectoryName);
+
+            this.copySubFolder(currentTrainingDirectory, currentCorpusDirectory, "raw");
+            this.copySubFolder(currentTrainingDirectory, currentCorpusDirectory, "tei");
+        }
 
     }
 
