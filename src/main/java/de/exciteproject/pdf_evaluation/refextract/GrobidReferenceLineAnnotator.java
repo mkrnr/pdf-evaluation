@@ -13,28 +13,26 @@ import org.grobid.core.factory.GrobidFactory;
 import org.grobid.core.mock.MockContext;
 import org.grobid.core.utilities.GrobidProperties;
 
-public class GrobidReferenceExtractor {
+public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
 
     public static void main(String[] args) throws IOException {
         File inputDir = new File(args[0]);
         File outputDir = new File(args[1]);
         File grobidHomeDir = new File(args[2]);
+        File trainingModelDirectory = new File(args[3]);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }
-        GrobidReferenceExtractor grobidReferenceExtractor = new GrobidReferenceExtractor(grobidHomeDir);
+        GrobidReferenceLineAnnotator grobidReferenceExtractor = new GrobidReferenceLineAnnotator(grobidHomeDir);
         for (File inputFile : inputDir.listFiles()) {
             File outputFile = new File(
                     outputDir.getAbsolutePath() + File.separator + inputFile.getName().split("\\.")[0] + ".csv");
 
-            // TODO remove
-            if (outputFile.exists()) {
-                continue;
-            }
             try {
                 // List<String> references =
                 // grobidReferenceExtractor.extractFromReferenceStrings(inputFile);
-                List<String> references = grobidReferenceExtractor.extractAnnotatedLinesFromPDF(inputFile);
+                List<String> references = grobidReferenceExtractor.extractAnnotatedReferenceLinesFromPDF(inputFile,
+                        trainingModelDirectory);
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile));
                 for (String reference : references) {
                     bufferedWriter.write(reference);
@@ -50,14 +48,18 @@ public class GrobidReferenceExtractor {
 
     private File grobidHomeDir;
 
-    public GrobidReferenceExtractor(File grobidHomeDir) {
+    public GrobidReferenceLineAnnotator(File grobidHomeDir) {
         this.grobidHomeDir = grobidHomeDir;
     }
 
-    /*
-     * TODO:refactor
-     */
-    public List<String> extractAnnotatedLinesFromPDF(File pdfFile) {
+    public List<String> extractAnnotatedReferenceLinesFromPDF(File pdfFile, File trainingModelsDirectory)
+            throws IOException {
+        this.initializeModels(trainingModelsDirectory);
+        return this.annotateReferenceLinesFromPDF(pdfFile);
+    }
+
+    @Override
+    public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
         List<String> references = new ArrayList<String>();
         try {
             File grobidPropertiesFile = new File(
@@ -79,7 +81,10 @@ public class GrobidReferenceExtractor {
 
                 reference = reference.replaceAll("@BULLET", "•");
 
-                references.add(reference);
+                String[] referenceSplit = reference.split("\\n");
+                for (String referenceLine : referenceSplit) {
+                    references.add(referenceLine);
+                }
             }
         } catch (Exception e) {
             // If an exception is generated, print a stack trace
@@ -93,6 +98,28 @@ public class GrobidReferenceExtractor {
         }
 
         return references;
+    }
+
+    private void copyModelsToHome(File trainingModelDirectory) throws IOException {
+
+        String[] modelDirectoryNames = { "segmentation", "reference-segmenter" };
+
+        File modelTargetDirectory = new File(this.grobidHomeDir + File.separator + "models");
+
+        for (String modelDirectoryName : modelDirectoryNames) {
+            // run training of segmentation
+            File currentModelSourceFile = new File(
+                    trainingModelDirectory + File.separator + modelDirectoryName + File.separator + "model.wapiti");
+            File currentModelTargetFile = new File(
+                    modelTargetDirectory + File.separator + modelDirectoryName + File.separator + "model.wapiti");
+            org.apache.commons.io.FileUtils.copyFile(currentModelSourceFile, currentModelTargetFile);
+        }
+
+    }
+
+    @Override
+    public void initializeModels(File trainingModelsDirectory) throws IOException {
+        this.copyModelsToHome(trainingModelsDirectory);
     }
 
 }

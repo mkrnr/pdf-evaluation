@@ -15,31 +15,28 @@ public class GrobidRefExtractTrainer extends RefExtractTrainer {
         File trainingSourceDirectory = new File(args[1]);
         File trainingTargetDirectory = new File(args[2]);
 
-        GrobidRefExtractTrainer grobidRefExtractTrainer = new GrobidRefExtractTrainer(grobidHomeDirectory,
-                trainingTargetDirectory);
-        grobidRefExtractTrainer.train(trainingSourceDirectory);
+        GrobidRefExtractTrainer grobidRefExtractTrainer = new GrobidRefExtractTrainer(grobidHomeDirectory);
+        grobidRefExtractTrainer.train(trainingSourceDirectory, trainingTargetDirectory);
     }
 
     private File grobidHomeDirectory;
-    private File trainingTargetDirectory;
 
-    public GrobidRefExtractTrainer(File grobidHomeDirectory, File trainingTargetDirectory) {
+    public GrobidRefExtractTrainer(File grobidHomeDirectory) {
         this.grobidHomeDirectory = grobidHomeDirectory;
-        this.trainingTargetDirectory = trainingTargetDirectory;
     }
 
-    public void train(File trainingFilesDirectory) throws Exception {
+    public void train(File trainingFilesDirectory, File trainingTargetDirectory) throws Exception {
         this.copyTrainingFiles(trainingFilesDirectory);
 
         String[] modelDirectoryNames = { "segmentation", "reference-segmenter" };
+        File modelSourceDirectory = new File(grobidHomeDirectory + File.separator + "models");
+        File modelTargetDirectory = new File(trainingTargetDirectory + File.separator);
+
         for (String modelDirectoryName : modelDirectoryNames) {
             // run training of segmentation
             String[] trainingArguments = { "0", modelDirectoryName, "-gH", this.grobidHomeDirectory.getAbsolutePath() };
 
             TrainerRunner.main(trainingArguments);
-
-            File modelSourceDirectory = new File(grobidHomeDirectory + File.separator + "models");
-            File modelTargetDirectory = new File(trainingTargetDirectory + File.separator + "models");
 
             File currentModelSourceFile = new File(
                     modelSourceDirectory + File.separator + modelDirectoryName + File.separator + "model.wapiti");

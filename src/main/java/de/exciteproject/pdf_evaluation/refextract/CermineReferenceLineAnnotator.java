@@ -16,7 +16,7 @@ import pl.edu.icm.cermine.configuration.ExtractionConfigBuilder;
 import pl.edu.icm.cermine.configuration.ExtractionConfigRegister;
 import pl.edu.icm.cermine.exception.AnalysisException;
 
-public class CermineReferenceLineAnnotator {
+public class CermineReferenceLineAnnotator extends ReferenceLineAnnotator {
 
     public static void main(String[] args) throws AnalysisException, IOException {
 
@@ -63,6 +63,42 @@ public class CermineReferenceLineAnnotator {
 
         }
 
+    }
+
+    private File configurationFile;
+
+    @Override
+    public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
+        ExtractionConfigBuilder builder = new ExtractionConfigBuilder();
+        builder.addConfiguration(this.configurationFile.getAbsolutePath());
+        ExtractionConfigRegister.set(builder.buildConfiguration());
+
+        List<String> references = new ArrayList<String>();
+        try {
+            ContentExtractor extractor = new ContentExtractor();
+
+            ComponentConfiguration conf = new ComponentConfiguration();
+            conf.setBibReferenceExtractor(new CermineModKMeansBibReferenceExtractor());
+            extractor.setConf(conf);
+
+            InputStream inputStream = new FileInputStream(pdfFile);
+            extractor.setPDF(inputStream);
+            List<BibEntry> result = extractor.getReferences();
+            for (BibEntry bibEntry : result) {
+                String referenceString = bibEntry.getText();
+                references.add(referenceString);
+            }
+        } catch (AnalysisException e) {
+            e.printStackTrace();
+            throw new IOException("AnalysisException");
+        }
+
+        return references;
+    }
+
+    @Override
+    public void initializeModels(File trainingModelsDirectory) throws IOException {
+        this.configurationFile = new File(trainingModelsDirectory + File.separator + "cermine.properties");
     }
 
 }

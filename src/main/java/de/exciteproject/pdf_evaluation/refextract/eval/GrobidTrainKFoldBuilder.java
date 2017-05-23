@@ -3,18 +3,18 @@ package de.exciteproject.pdf_evaluation.refextract.eval;
 import java.io.File;
 import java.io.IOException;
 
-public class GrobidKFoldBuilder extends KFoldBuilder {
+public class GrobidTrainKFoldBuilder extends KFoldBuilder {
 
     public static void main(String[] args) throws IOException {
         int k = Integer.parseInt(args[0]);
         File idFile = new File(args[1]);
         File sourceDirectory = new File(args[2]);
         File targetDirectory = new File(args[3]);
-        GrobidKFoldBuilder grobidKFoldBuilder = new GrobidKFoldBuilder(k, idFile);
+        GrobidTrainKFoldBuilder grobidKFoldBuilder = new GrobidTrainKFoldBuilder(k, idFile);
         grobidKFoldBuilder.build(0, sourceDirectory, targetDirectory);
     }
 
-    public GrobidKFoldBuilder(int k, File idFile) throws IOException {
+    public GrobidTrainKFoldBuilder(int k, File idFile) throws IOException {
         super(k, idFile);
     }
 

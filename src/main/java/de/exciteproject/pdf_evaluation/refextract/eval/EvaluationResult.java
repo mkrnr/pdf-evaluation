@@ -1,7 +1,10 @@
 package de.exciteproject.pdf_evaluation.refextract.eval;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.exciteproject.pdf_evaluation.util.JsonUtils;
 
 public class EvaluationResult {
     private List<String> truePositives;
@@ -26,6 +29,12 @@ public class EvaluationResult {
         return 2 * (precision * recall) / (precision + recall);
     }
 
+    public void addEvaluationResult(EvaluationResult evaluationResult) {
+        this.truePositives.addAll(evaluationResult.truePositives);
+        this.falseNegatives.addAll(evaluationResult.falseNegatives);
+        this.falsePositives.addAll(evaluationResult.falsePositives);
+    }
+
     public double getPrecision() {
 
         return (double) truePositives.size() / (truePositives.size() + falsePositives.size());
@@ -33,6 +42,14 @@ public class EvaluationResult {
 
     public double getRecall() {
         return (double) truePositives.size() / (truePositives.size() + falseNegatives.size());
+    }
+
+    public static EvaluationResult readFromJson(File inputFile) {
+        return (EvaluationResult) JsonUtils.readFromFile(EvaluationResult.class, inputFile);
+    }
+
+    public static void writeAsJson(EvaluationResult evaluationResult, File outputFile) {
+        JsonUtils.writeToFile(evaluationResult, outputFile);
     }
 
     public String toString() {

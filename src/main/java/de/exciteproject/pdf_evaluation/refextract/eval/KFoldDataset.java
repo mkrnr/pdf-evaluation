@@ -20,9 +20,9 @@ public class KFoldDataset {
         File inputDirectory = new File(args[2]);
         File outputDirectory = new File(args[3]);
 
-        KFoldDataset kFoldDatasetBuilder = new KFoldDataset(k);
-        kFoldDatasetBuilder.build(idFile, inputDirectory);
-        kFoldDatasetBuilder.writeFolds(outputDirectory);
+        KFoldDataset kFoldDataset = new KFoldDataset(k);
+        kFoldDataset.build(idFile, inputDirectory);
+        kFoldDataset.writeFolds(outputDirectory);
     }
 
     private int k;

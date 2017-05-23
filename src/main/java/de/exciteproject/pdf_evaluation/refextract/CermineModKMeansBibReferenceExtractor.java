@@ -30,9 +30,9 @@ import pl.edu.icm.cermine.tools.distance.FeatureVectorEuclideanMetric;
  */
 public class CermineModKMeansBibReferenceExtractor implements BibReferenceExtractor {
 
-    public static final int MAX_REF_LINES_COUNT = 10000;
+    public static final int MAX_REF_LINES_COUNT = 10000000;
 
-    public static final int MAX_REFS_COUNT = 1000;
+    public static final int MAX_REFS_COUNT = 100000;
 
     public static final int MAX_REF_LENGTH = 1500;
 
@@ -101,21 +101,17 @@ public class CermineModKMeansBibReferenceExtractor implements BibReferenceExtrac
         }
 
         List<String> references = new ArrayList<String>();
-        String actRef = "";
         for (int i = 0; i < lines.size(); i++) {
             if (clusters[firstInstanceClusterNum].contains(instances.get(i))) {
-                this.addReferenceToList(actRef, references);
-                actRef = "B-REF\t" + lines.get(i) + "\n";
+                this.addReferenceToList("B-REF\t" + lines.get(i) + "\n", references);
             } else {
-                actRef += "I-REF\t" + lines.get(i) + "\n";
+                this.addReferenceToList("I-REF\t" + lines.get(i) + "\n", references);
             }
         }
-        this.addReferenceToList(actRef, references);
 
         if (references.size() > MAX_REFS_COUNT) {
             references.clear();
         }
-
         return references.toArray(new String[references.size()]);
     }
 

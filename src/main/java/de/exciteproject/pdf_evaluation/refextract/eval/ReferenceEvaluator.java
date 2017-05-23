@@ -28,7 +28,11 @@ public class ReferenceEvaluator {
             File correctFile = new File(correctDir.getAbsolutePath() + File.separator + predictedFile.getName());
             File outputFile = new File(outputDir.getAbsolutePath() + File.separator + correctFile.getName());
             System.out.println("check: " + correctFile.getName());
-            EvaluationResult evaluationResult = referenceEvaluator.evaluateReferenceLines(correctFile, predictedFile);
+            EvaluationResult evaluationResult = referenceEvaluator.evaluateMergedReferenceStrings(correctFile,
+                    predictedFile);
+            // EvaluationResult evaluationResult =
+            // referenceEvaluator.evaluateReferenceLines(correctFile,
+            // predictedFile);
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile));
             bufferedWriter.write(evaluationResult.toString());
 
@@ -43,9 +47,22 @@ public class ReferenceEvaluator {
         return this.compareStrings(correctLines, predictedFileContent);
     }
 
+    public EvaluationResult evaluateReferenceLines(List<String> correctLines, List<String> predictedLines)
+            throws IOException {
+        return this.compareStrings(correctLines, predictedLines);
+    }
+
     public EvaluationResult evaluateMergedReferenceStrings(File correctFile, File predictedFile) throws IOException {
         List<String> correctLines = this.readLines(correctFile);
         List<String> predictedLines = this.readLines(predictedFile);
+
+        List<String> mergedCorrectLines = this.mergeLinesToReferences(correctLines);
+        List<String> mergedPredictedLines = this.mergeLinesToReferences(predictedLines);
+        return this.compareStrings(mergedCorrectLines, mergedPredictedLines);
+    }
+
+    public EvaluationResult evaluateMergedReferenceStrings(List<String> correctLines, List<String> predictedLines)
+            throws IOException {
 
         List<String> mergedCorrectLines = this.mergeLinesToReferences(correctLines);
         List<String> mergedPredictedLines = this.mergeLinesToReferences(predictedLines);

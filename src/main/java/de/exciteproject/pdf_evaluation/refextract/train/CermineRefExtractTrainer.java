@@ -19,22 +19,11 @@ public class CermineRefExtractTrainer extends RefExtractTrainer {
         File trainingSourceDirectory = new File(args[0]);
         File trainingTargetDirectory = new File(args[1]);
 
-        CermineRefExtractTrainer cermineRefExtractTrainer = new CermineRefExtractTrainer(trainingTargetDirectory);
-        cermineRefExtractTrainer.train(trainingSourceDirectory);
+        CermineRefExtractTrainer cermineRefExtractTrainer = new CermineRefExtractTrainer();
+        cermineRefExtractTrainer.train(trainingSourceDirectory, trainingTargetDirectory);
     }
 
-    private File trainingTargetDirectory;
-
-    /**
-     * 
-     * @param homeDirectory:
-     *            the directory that CERMINE accesses during training
-     */
-    public CermineRefExtractTrainer(File trainingTargetDirectory) {
-        this.trainingTargetDirectory = trainingTargetDirectory;
-    }
-
-    public void train(File trainingSourceDirectory)
+    public void train(File trainingSourceDirectory, File trainingTargetDirectory)
             throws IOException, InterruptedException, ParseException, AnalysisException, CloneNotSupportedException {
 
         // run training for metadata, body, and category models

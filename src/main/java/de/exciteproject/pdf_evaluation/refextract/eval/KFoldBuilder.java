@@ -16,6 +16,8 @@ public abstract class KFoldBuilder {
         this.idFile = idFile;
     }
 
+    public abstract void build(int i, File sourceDirectory, File targetDirectory) throws IOException;
+
     protected void buildDirectory(int i, File inputDirectory, File outputDirectory) throws IOException {
         if (!inputDirectory.exists()) {
             inputDirectory.mkdirs();
@@ -31,6 +33,5 @@ public abstract class KFoldBuilder {
         for (File trainingFileToCopy : trainingFilesToCopy) {
             FileUtils.copyFileToDirectory(trainingFileToCopy, outputDirectory);
         }
-
     }
 }

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.exciteproject.refext.extract.CermineLineLayoutExtractor;
@@ -11,7 +12,7 @@ import de.exciteproject.refext.extract.CrfReferenceLineAnnotator;
 import pl.edu.icm.cermine.ComponentConfiguration;
 import pl.edu.icm.cermine.exception.AnalysisException;
 
-public class RefextReferenceExtractor {
+public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
 
     public static void main(String[] args) throws IOException, AnalysisException {
 
@@ -24,7 +25,6 @@ public class RefextReferenceExtractor {
 
         CrfReferenceLineAnnotator crfReferenceLineAnnotator = new CrfReferenceLineAnnotator(modelFile);
 
-        // TODO: add trained cermine models!!!!!
         ComponentConfiguration componentConfiguration = new ComponentConfiguration();
         CermineLineLayoutExtractor cermineLineLayoutExtractor = new CermineLineLayoutExtractor(componentConfiguration);
 
@@ -51,4 +51,36 @@ public class RefextReferenceExtractor {
         }
     }
 
+    private File modelFile;
+
+    @Override
+    public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
+        List<String> annotatedReferenceLines = new ArrayList<String>();
+        try {
+            CrfReferenceLineAnnotator crfReferenceLineAnnotator = new CrfReferenceLineAnnotator(modelFile);
+
+            ComponentConfiguration componentConfiguration = new ComponentConfiguration();
+            CermineLineLayoutExtractor cermineLineLayoutExtractor = new CermineLineLayoutExtractor(
+                    componentConfiguration);
+
+            List<String> layoutLines = cermineLineLayoutExtractor.extract(pdfFile);
+            List<String> annotatedLines = crfReferenceLineAnnotator.annotate(layoutLines);
+            for (String annotatedLine : annotatedLines) {
+                if (annotatedLine.startsWith("B-REF") || annotatedLine.startsWith("I-REF")) {
+                    annotatedReferenceLines.add(annotatedLine);
+                }
+            }
+        } catch (AnalysisException e) {
+            e.printStackTrace();
+            throw new IOException("AnalysisException");
+        }
+
+        return annotatedReferenceLines;
+    }
+
+    @Override
+    public void initializeModels(File trainingModelsDirectory) throws IOException {
+        this.modelFile = new File(trainingModelsDirectory + File.separator + "model.ser");
+
+    }
 }
