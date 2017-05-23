@@ -37,7 +37,7 @@
     <dependency>
 	  <groupId>com.github.exciteproject</groupId>
 	  <artifactId>refext</artifactId>
-	  <version>dd1f2774fe</version>
+	  <version>5f5d70215d</version>
 	</dependency>
 	<dependency>
       <groupId>com.cybozu.labs</groupId>
@@ -52,7 +52,12 @@
     <dependency>
       <groupId>org.grobid</groupId>
       <artifactId>grobid-core</artifactId>
-      <version>0.4.2-SNAPSHOT</version>
+      <version>0.4.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.grobid</groupId>
+      <artifactId>grobid-trainer</artifactId>
+      <version>0.4.1</version>
     </dependency>
   </dependencies>
 </project>

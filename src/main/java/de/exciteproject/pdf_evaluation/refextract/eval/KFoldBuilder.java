@@ -1,0 +1,36 @@
+package de.exciteproject.pdf_evaluation.refextract.eval;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+
+public abstract class KFoldBuilder {
+
+    protected int k;
+    protected File idFile;
+
+    public KFoldBuilder(int k, File idFile) {
+        this.k = k;
+        this.idFile = idFile;
+    }
+
+    protected void buildDirectory(int i, File inputDirectory, File outputDirectory) throws IOException {
+        if (!inputDirectory.exists()) {
+            inputDirectory.mkdirs();
+        }
+        if (!outputDirectory.exists()) {
+            outputDirectory.mkdirs();
+        }
+        KFoldDataset kFoldDataset = new KFoldDataset(k);
+        kFoldDataset.build(idFile, inputDirectory);
+        List<File> trainingFilesToCopy = kFoldDataset.getTrainingFold(i);
+        System.out.println(trainingFilesToCopy.size());
+        FileUtils.cleanDirectory(outputDirectory);
+        for (File trainingFileToCopy : trainingFilesToCopy) {
+            FileUtils.copyFileToDirectory(trainingFileToCopy, outputDirectory);
+        }
+
+    }
+}
