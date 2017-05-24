@@ -25,11 +25,12 @@ public class GrobidRefExtractTrainer extends RefExtractTrainer {
         this.grobidHomeDirectory = grobidHomeDirectory;
     }
 
+    @Override
     public void train(File trainingFilesDirectory, File trainingTargetDirectory) throws Exception {
         this.copyTrainingFiles(trainingFilesDirectory);
 
         String[] modelDirectoryNames = { "segmentation", "reference-segmenter" };
-        File modelSourceDirectory = new File(grobidHomeDirectory + File.separator + "models");
+        File modelSourceDirectory = new File(this.grobidHomeDirectory + File.separator + "models");
         File modelTargetDirectory = new File(trainingTargetDirectory + File.separator);
 
         for (String modelDirectoryName : modelDirectoryNames) {
@@ -51,6 +52,11 @@ public class GrobidRefExtractTrainer extends RefExtractTrainer {
 
     }
 
+    private void copySubFolder(File sourceDirectory, File targetDirectory, String subFolderName) throws IOException {
+        FileUtils.copyAndReplaceInDir(new File(sourceDirectory + File.separator + subFolderName),
+                new File(targetDirectory + File.separator + subFolderName));
+    }
+
     private void copyTrainingFiles(File trainingFilesDirectory) throws IOException {
         File datasetDirectory = new File(this.grobidHomeDirectory.getParentFile() + File.separator + "grobid-trainer"
                 + File.separator + "resources" + File.separator + "dataset");
@@ -67,12 +73,6 @@ public class GrobidRefExtractTrainer extends RefExtractTrainer {
             this.copySubFolder(currentTrainingDirectory, currentCorpusDirectory, "raw");
             this.copySubFolder(currentTrainingDirectory, currentCorpusDirectory, "tei");
         }
-
-    }
-
-    private void copySubFolder(File sourceDirectory, File targetDirectory, String subFolderName) throws IOException {
-        FileUtils.copyAndReplaceInDir(new File(sourceDirectory + File.separator + subFolderName),
-                new File(targetDirectory + File.separator + subFolderName));
     }
 
 }

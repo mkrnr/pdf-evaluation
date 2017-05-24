@@ -29,23 +29,19 @@ import pl.edu.icm.cermine.structure.transformers.BxDocumentToTrueVizWriter;
  */
 public class CermineTruVizBuilder {
 
-    public ContentExtractor getContentExtractor() throws AnalysisException {
-        ComponentConfiguration componentConfiguration = new ComponentConfiguration();
-        ITextCharacterExtractor iTextCharacterExtractor = new ITextCharacterExtractor();
-        // set page limits to override the default limits
-        iTextCharacterExtractor.setPagesLimits(-1, -1);
+    public static void main(String[] args)
+            throws IOException, AnalysisException, ParseException, TransformationException {
+        File inputDir = new File(args[0]);
+        String outputFormat = args[1];
 
-        componentConfiguration.setCharacterExtractor(iTextCharacterExtractor);
+        CermineTruVizBuilder cermineTruVizBuilder = new CermineTruVizBuilder();
 
-        ContentExtractor contentExtractor = new ContentExtractor();
-        contentExtractor.setConf(componentConfiguration);
-        return contentExtractor;
-
+        cermineTruVizBuilder.build(inputDir, outputFormat);
     }
 
     /**
      * Builds the TruViz files in inputDirectory TODO: add more parameters
-     * 
+     *
      * @param inputDirectory
      * @throws TransformationException
      * @throws IOException
@@ -103,20 +99,23 @@ public class CermineTruVizBuilder {
             }
 
             i++;
-            int percentage = i * 100 / files.size();
+            int percentage = (i * 100) / files.size();
             System.out.println("Extraction time: " + Math.round(elapsed) + "s");
             System.out.println("Progress: " + percentage + "% done (" + i + " out of " + files.size() + ")");
         }
     }
 
-    public static void main(String[] args)
-            throws IOException, AnalysisException, ParseException, TransformationException {
-        File inputDir = new File(args[0]);
-        String outputFormat = args[1];
+    public ContentExtractor getContentExtractor() throws AnalysisException {
+        ComponentConfiguration componentConfiguration = new ComponentConfiguration();
+        ITextCharacterExtractor iTextCharacterExtractor = new ITextCharacterExtractor();
+        // set page limits to override the default limits
+        iTextCharacterExtractor.setPagesLimits(-1, -1);
 
-        CermineTruVizBuilder cermineTruVizBuilder = new CermineTruVizBuilder();
+        componentConfiguration.setCharacterExtractor(iTextCharacterExtractor);
 
-        cermineTruVizBuilder.build(inputDir, outputFormat);
+        ContentExtractor contentExtractor = new ContentExtractor();
+        contentExtractor.setConf(componentConfiguration);
+        return contentExtractor;
 
     }
 

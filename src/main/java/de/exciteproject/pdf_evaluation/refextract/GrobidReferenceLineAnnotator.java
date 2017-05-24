@@ -52,12 +52,6 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
         this.grobidHomeDir = grobidHomeDir;
     }
 
-    public List<String> extractAnnotatedReferenceLinesFromPDF(File pdfFile, File trainingModelsDirectory)
-            throws IOException {
-        this.initializeModels(trainingModelsDirectory);
-        return this.annotateReferenceLinesFromPDF(pdfFile);
-    }
-
     @Override
     public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
         List<String> references = new ArrayList<String>();
@@ -100,6 +94,17 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
         return references;
     }
 
+    public List<String> extractAnnotatedReferenceLinesFromPDF(File pdfFile, File trainingModelsDirectory)
+            throws IOException {
+        this.initializeModels(trainingModelsDirectory);
+        return this.annotateReferenceLinesFromPDF(pdfFile);
+    }
+
+    @Override
+    public void initializeModels(File trainingModelsDirectory) throws IOException {
+        this.copyModelsToHome(trainingModelsDirectory);
+    }
+
     protected void copyModelsToHome(File trainingModelDirectory) throws IOException {
 
         String[] modelDirectoryNames = { "segmentation", "reference-segmenter" };
@@ -115,11 +120,6 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
             org.apache.commons.io.FileUtils.copyFile(currentModelSourceFile, currentModelTargetFile);
         }
 
-    }
-
-    @Override
-    public void initializeModels(File trainingModelsDirectory) throws IOException {
-        this.copyModelsToHome(trainingModelsDirectory);
     }
 
 }

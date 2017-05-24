@@ -23,6 +23,7 @@ public class CermineRefExtractTrainer extends RefExtractTrainer {
         cermineRefExtractTrainer.train(trainingSourceDirectory, trainingTargetDirectory);
     }
 
+    @Override
     public void train(File trainingSourceDirectory, File trainingTargetDirectory)
             throws IOException, InterruptedException, ParseException, AnalysisException, CloneNotSupportedException {
 
@@ -52,7 +53,6 @@ public class CermineRefExtractTrainer extends RefExtractTrainer {
         this.addConfigLines("contentFilter", modelBodyFile, bufferedWriter);
 
         bufferedWriter.close();
-
     }
 
     private void addConfigLines(String configName, File modelFile, BufferedWriter bufferedWriter) throws IOException {

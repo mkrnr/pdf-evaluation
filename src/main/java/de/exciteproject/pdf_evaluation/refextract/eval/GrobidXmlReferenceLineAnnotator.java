@@ -40,9 +40,7 @@ public class GrobidXmlReferenceLineAnnotator {
                 bufferedWriter.newLine();
             }
             bufferedWriter.close();
-
         }
-
     }
 
     public List<String> annotate(File xmlFile) throws IOException {

@@ -34,7 +34,6 @@ public class FileMapper {
             bufferedWriter.newLine();
         }
         bufferedWriter.close();
-
     }
 
 }

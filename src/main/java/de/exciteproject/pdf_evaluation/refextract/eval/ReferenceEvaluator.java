@@ -41,17 +41,6 @@ public class ReferenceEvaluator {
         }
     }
 
-    public EvaluationResult evaluateReferenceLines(File correctFile, File predictedFile) throws IOException {
-        List<String> correctLines = this.readLines(correctFile);
-        List<String> predictedFileContent = this.readLines(predictedFile);
-        return this.compareStrings(correctLines, predictedFileContent);
-    }
-
-    public EvaluationResult evaluateReferenceLines(List<String> correctLines, List<String> predictedLines)
-            throws IOException {
-        return this.compareStrings(correctLines, predictedLines);
-    }
-
     public EvaluationResult evaluateMergedReferenceStrings(File correctFile, File predictedFile) throws IOException {
         List<String> correctLines = this.readLines(correctFile);
         List<String> predictedLines = this.readLines(predictedFile);
@@ -69,10 +58,41 @@ public class ReferenceEvaluator {
         return this.compareStrings(mergedCorrectLines, mergedPredictedLines);
     }
 
+    public EvaluationResult evaluateReferenceLines(File correctFile, File predictedFile) throws IOException {
+        List<String> correctLines = this.readLines(correctFile);
+        List<String> predictedFileContent = this.readLines(predictedFile);
+        return this.compareStrings(correctLines, predictedFileContent);
+    }
+
+    public EvaluationResult evaluateReferenceLines(List<String> correctLines, List<String> predictedLines)
+            throws IOException {
+        return this.compareStrings(correctLines, predictedLines);
+    }
+
+    private EvaluationResult compareStrings(List<String> correctLines, List<String> predictedLines) {
+
+        List<String> tempCorrectLines = new ArrayList<String>(correctLines);
+        List<String> tempPredictedLines = new ArrayList<String>(predictedLines);
+
+        List<String> matchedLines = new ArrayList<String>();
+
+        for (int i = tempPredictedLines.size() - 1; i >= 0; i--) {
+            for (int j = tempCorrectLines.size() - 1; j >= 0; j--) {
+                if (tempCorrectLines.get(j).equals(tempPredictedLines.get(i))) {
+                    matchedLines.add(0, tempPredictedLines.get(i));
+                    tempCorrectLines.remove(j);
+                    tempPredictedLines.remove(i);
+                    break;
+                }
+            }
+        }
+        return new EvaluationResult(matchedLines, tempCorrectLines, tempPredictedLines);
+    }
+
     /**
      * During the merging, lines are simply concatenated. This simple approach
      * is intended for evaluation purposes only
-     * 
+     *
      * @param referenceLines
      * @return
      */
@@ -95,26 +115,6 @@ public class ReferenceEvaluator {
 
     private List<String> readLines(File file) throws IOException {
         return Arrays.asList(FileUtils.readFile(file).split("\\n"));
-    }
-
-    private EvaluationResult compareStrings(List<String> correctLines, List<String> predictedLines) {
-
-        List<String> tempCorrectLines = new ArrayList<String>(correctLines);
-        List<String> tempPredictedLines = new ArrayList<String>(predictedLines);
-
-        List<String> matchedLines = new ArrayList<String>();
-
-        for (int i = tempPredictedLines.size() - 1; i >= 0; i--) {
-            for (int j = tempCorrectLines.size() - 1; j >= 0; j--) {
-                if (tempCorrectLines.get(j).equals(tempPredictedLines.get(i))) {
-                    matchedLines.add(0, tempPredictedLines.get(i));
-                    tempCorrectLines.remove(j);
-                    tempPredictedLines.remove(i);
-                    break;
-                }
-            }
-        }
-        return new EvaluationResult(matchedLines, tempCorrectLines, tempPredictedLines);
     }
 
 }

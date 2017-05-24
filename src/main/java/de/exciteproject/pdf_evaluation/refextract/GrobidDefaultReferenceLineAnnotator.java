@@ -37,7 +37,6 @@ public class GrobidDefaultReferenceLineAnnotator extends GrobidReferenceLineAnno
                 System.err.println("stackoverglow at file: " + inputFile.getAbsolutePath());
             }
         }
-
     }
 
     private File grobidHomeDir;
@@ -46,6 +45,11 @@ public class GrobidDefaultReferenceLineAnnotator extends GrobidReferenceLineAnno
     public GrobidDefaultReferenceLineAnnotator(File grobidHomeDir, File defaultModelDir) {
         super(grobidHomeDir);
         this.defaultModelDir = defaultModelDir;
+    }
+
+    @Override
+    public void initializeModels(File trainingModelsDirectory) throws IOException {
+        this.copyModelsToHome(trainingModelsDirectory);
     }
 
     /**
@@ -67,11 +71,6 @@ public class GrobidDefaultReferenceLineAnnotator extends GrobidReferenceLineAnno
             org.apache.commons.io.FileUtils.copyFile(currentModelSourceFile, currentModelTargetFile);
         }
 
-    }
-
-    @Override
-    public void initializeModels(File trainingModelsDirectory) throws IOException {
-        this.copyModelsToHome(trainingModelsDirectory);
     }
 
 }

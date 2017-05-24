@@ -25,8 +25,8 @@ public abstract class KFoldBuilder {
         if (!outputDirectory.exists()) {
             outputDirectory.mkdirs();
         }
-        KFoldDataset kFoldDataset = new KFoldDataset(k);
-        kFoldDataset.build(idFile, inputDirectory);
+        KFoldDataset kFoldDataset = new KFoldDataset(this.k);
+        kFoldDataset.build(this.idFile, inputDirectory);
         List<File> trainingFilesToCopy = kFoldDataset.getTrainingFold(i);
         System.out.println(trainingFilesToCopy.size());
         FileUtils.cleanDirectory(outputDirectory);
@@ -34,4 +34,5 @@ public abstract class KFoldBuilder {
             FileUtils.copyFileToDirectory(trainingFileToCopy, outputDirectory);
         }
     }
+
 }

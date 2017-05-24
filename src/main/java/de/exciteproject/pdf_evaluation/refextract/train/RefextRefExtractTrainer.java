@@ -29,7 +29,7 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
     private List<String> featureNames;
 
     /**
-     * 
+     *
      * @param trainingTargetDirectory:
      *            the directory that CERMINE accesses during training
      */
@@ -37,11 +37,12 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
         this.featureNames = featureNames;
     }
 
+    @Override
     public void train(File trainingSourceDirectory, File trainingTargetDirectory)
             throws IOException, InterruptedException, ParseException, AnalysisException, LangDetectException {
 
         // run training for metadata, body, and category models
-        ReferenceExtractorTrainer referenceExtractorTrainer = new ReferenceExtractorTrainer(featureNames);
+        ReferenceExtractorTrainer referenceExtractorTrainer = new ReferenceExtractorTrainer(this.featureNames);
         InstanceList trainingInstances = referenceExtractorTrainer.buildInstanceListFromDir(trainingSourceDirectory);
 
         referenceExtractorTrainer.addStartState();
@@ -53,7 +54,6 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
         CRF crf = referenceExtractorTrainer.train(trainingInstances, trainingInstances);
         File modelOutputFile = new File(trainingTargetDirectory + File.separator + "model.ser");
         crf.write(modelOutputFile);
-
     }
 
 }

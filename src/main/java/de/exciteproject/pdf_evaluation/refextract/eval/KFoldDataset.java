@@ -41,38 +41,37 @@ public class KFoldDataset {
 
         // initialize testingFilesPerFold
         this.testingFolds = new ArrayList<List<File>>();
-        for (int i = 0; i < k; i++) {
-            testingFolds.add(new ArrayList<File>());
+        for (int i = 0; i < this.k; i++) {
+            this.testingFolds.add(new ArrayList<File>());
         }
 
         // add files to testFilesPerFold iteratively
         List<String> idsCopy = new ArrayList<String>(ids);
         while (idsCopy.size() > 0) {
-            for (int i = 0; i < k; i++) {
+            for (int i = 0; i < this.k; i++) {
                 if (idsCopy.size() < 1) {
                     break;
                 }
                 String currentId = idsCopy.remove(0);
                 System.out.println(currentId);
-                testingFolds.get(i).add(this.getFile(currentId, inputFiles));
+                this.testingFolds.get(i).add(this.getFile(currentId, inputFiles));
             }
         }
 
         // build trainingFilesPerFold from the remaining files which are not in
         // the individual test set
         this.trainingFolds = new ArrayList<List<File>>();
-        for (int i = 0; i < k; i++) {
+        for (int i = 0; i < this.k; i++) {
             List<File> inputFilesCopy = new ArrayList<File>(inputFiles);
             System.out.println("------");
-            System.out.println(testingFolds.get(i));
+            System.out.println(this.testingFolds.get(i));
             System.out.println(inputFilesCopy);
             System.out.println(inputFilesCopy.size());
-            inputFilesCopy.removeAll(testingFolds.get(i));
+            inputFilesCopy.removeAll(this.testingFolds.get(i));
             System.out.println(inputFilesCopy.size());
             System.out.println("------");
-            trainingFolds.add(inputFilesCopy);
+            this.trainingFolds.add(inputFilesCopy);
         }
-
     }
 
     public List<File> getTestingFold(int k) {
@@ -109,6 +108,15 @@ public class KFoldDataset {
         Files.copy(sourceFile, targetFile);
     }
 
+    private File getFile(String id, List<File> files) {
+        for (File file : files) {
+            if (id.equals((file.getName().split("\\.")[0]))) {
+                return file;
+            }
+        }
+        return null;
+    }
+
     private List<String> readFileListFromFile(File listFile) {
         // taken from: http://stackoverflow.com/a/5343727
         Scanner s;
@@ -124,14 +132,6 @@ public class KFoldDataset {
             return list;
         }
         return list;
-    }
-
-    private File getFile(String id, List<File> files) {
-        for (File file : files) {
-            if (id.equals((file.getName().split("\\.")[0])))
-                return file;
-        }
-        return null;
     }
 
 }

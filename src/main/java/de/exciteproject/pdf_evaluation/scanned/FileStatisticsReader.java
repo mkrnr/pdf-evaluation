@@ -22,7 +22,6 @@ public class FileStatisticsReader {
             double bytes = inputFile.length();
             double kilobytes = (bytes / 1024);
             System.out.println((int) kilobytes);
-
         }
     }
 

@@ -21,17 +21,18 @@ public class SimpleKFoldBuilder extends KFoldBuilder {
     /**
      * Generate the files for fold i in the targetDirectory. Deletes existing
      * files in the targetDirectory
-     * 
+     *
      * @param i:
      *            current fold, starting at zero
      * @throws IOException
      */
+    @Override
     public void build(int i, File sourceDirectory, File targetDirectory) throws IOException {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
 
         this.buildDirectory(i, sourceDirectory, targetDirectory);
-
     }
+
 }

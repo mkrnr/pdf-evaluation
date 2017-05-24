@@ -47,7 +47,6 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
                 }
             }
             bufferedWriter.close();
-
         }
     }
 
@@ -57,7 +56,7 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
     public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
         List<String> annotatedReferenceLines = new ArrayList<String>();
         try {
-            CrfReferenceLineAnnotator crfReferenceLineAnnotator = new CrfReferenceLineAnnotator(modelFile);
+            CrfReferenceLineAnnotator crfReferenceLineAnnotator = new CrfReferenceLineAnnotator(this.modelFile);
 
             ComponentConfiguration componentConfiguration = new ComponentConfiguration();
             CermineLineLayoutExtractor cermineLineLayoutExtractor = new CermineLineLayoutExtractor(
@@ -83,4 +82,5 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
         this.modelFile = new File(trainingModelsDirectory + File.separator + "model.ser");
 
     }
+
 }

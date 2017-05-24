@@ -9,4 +9,5 @@ public abstract class ReferenceLineAnnotator {
     public abstract List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException;
 
     public abstract void initializeModels(File trainingModelsDirectory) throws IOException;
+
 }

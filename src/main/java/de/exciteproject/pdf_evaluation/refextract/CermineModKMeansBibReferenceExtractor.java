@@ -25,7 +25,7 @@ import pl.edu.icm.cermine.tools.distance.FeatureVectorEuclideanMetric;
 
 /**
  * Clustering-based bibliographic reference extractor.
- * 
+ *
  * @author Dominika Tkaczyk (d.tkaczyk@icm.edu.pl)
  */
 public class CermineModKMeansBibReferenceExtractor implements BibReferenceExtractor {
@@ -49,7 +49,7 @@ public class CermineModKMeansBibReferenceExtractor implements BibReferenceExtrac
      * The cluster containing the first line is then assumed to be the set of
      * all first lines, which allows for splitting references blocks into
      * individual references.
-     * 
+     *
      * @param document
      *            document
      * @return an array of extracted references
@@ -80,7 +80,7 @@ public class CermineModKMeansBibReferenceExtractor implements BibReferenceExtrac
             }
         }
 
-        if (lines.size() <= 1 || farthestDistance < 0.001) {
+        if ((lines.size() <= 1) || (farthestDistance < 0.001)) {
             if (lines.size() > MAX_REFS_COUNT) {
                 return new String[] {};
             } else {
@@ -117,7 +117,8 @@ public class CermineModKMeansBibReferenceExtractor implements BibReferenceExtrac
 
     private void addReferenceToList(String stringToAdd, List<String> list) {
         if (!stringToAdd.isEmpty() && stringToAdd.replaceAll("\n", " ").matches(".*[0-9].*")
-                && stringToAdd.replaceAll("\n", " ").matches(".*[a-zA-Z].*") && stringToAdd.length() < MAX_REF_LENGTH) {
+                && stringToAdd.replaceAll("\n", " ").matches(".*[a-zA-Z].*")
+                && (stringToAdd.length() < MAX_REF_LENGTH)) {
             list.add(stringToAdd.replaceFirst("\\n$", ""));
         }
     }
