@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 
+import de.exciteproject.pdf_evaluation.refextract.CermineDefaultReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.CermineReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.GrobidDefaultReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.GrobidReferenceLineAnnotator;
+import de.exciteproject.pdf_evaluation.refextract.ParsCitReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.ReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.RefextReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.train.CermineRefExtractTrainer;
@@ -60,12 +62,26 @@ public class EvaluationExecutor {
             referenceLineAnnotator = new CermineReferenceLineAnnotator();
             break;
         case 4:
+            // File defaultCermineConfigurationFile = new File(args[8]);
+            trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
+            // throws NullPointerException when train=true
+            refExtractTrainer = null;
+            referenceLineAnnotator = new CermineDefaultReferenceLineAnnotator();
+            break;
+        case 5:
             List<String> features = Arrays.asList(args[8].split(","));
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
             refExtractTrainer = new RefextRefExtractTrainer(features);
             referenceLineAnnotator = new RefextReferenceLineAnnotator();
             break;
 
+        case 6:
+            File citeExtractFile = new File(args[8]);
+            trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
+            // throws NullPointerException when train=true
+            refExtractTrainer = null;
+            referenceLineAnnotator = new ParsCitReferenceLineAnnotator(citeExtractFile);
+            break;
         }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-MM-ss-SSS");
@@ -90,13 +106,12 @@ public class EvaluationExecutor {
             }
             referenceLineAnnotator.initializeModels(currentFoldTrainingTargetDir);
 
-            // referenceExtractor.extractAnnotatedReferenceLinesFromPDF(pdfFile);
-
             System.out.println(foldTargetDirectory);
             File currentFoldEvaluationTargetDir = new File(currentFoldDir + File.separator + "evaluations");
-            // File evaluationOutputDir=new File()
+
             List<File> testFiles = testKFoldDataset.getTestingFold(i);
             for (File testFile : testFiles) {
+                System.out.println(testFile);
                 List<String> predictedReferenceLines = referenceLineAnnotator.annotateReferenceLinesFromPDF(testFile);
                 File annotatedFile = new File(annotatedFilesDirectory + File.separator
                         + FilenameUtils.removeExtension(testFile.getName()) + ".csv");

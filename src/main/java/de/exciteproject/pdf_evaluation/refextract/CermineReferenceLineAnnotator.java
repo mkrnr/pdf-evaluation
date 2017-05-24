@@ -65,7 +65,7 @@ public class CermineReferenceLineAnnotator extends ReferenceLineAnnotator {
 
     }
 
-    private File configurationFile;
+    protected File configurationFile;
 
     @Override
     public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
