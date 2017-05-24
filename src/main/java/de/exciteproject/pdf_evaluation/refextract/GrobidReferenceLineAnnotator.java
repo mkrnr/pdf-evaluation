@@ -100,7 +100,7 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
         return references;
     }
 
-    private void copyModelsToHome(File trainingModelDirectory) throws IOException {
+    protected void copyModelsToHome(File trainingModelDirectory) throws IOException {
 
         String[] modelDirectoryNames = { "segmentation", "reference-segmenter" };
 

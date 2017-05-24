@@ -1,12 +1,15 @@
 package de.exciteproject.pdf_evaluation.refextract.eval;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 
 import de.exciteproject.pdf_evaluation.refextract.CermineReferenceLineAnnotator;
+import de.exciteproject.pdf_evaluation.refextract.GrobidDefaultReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.GrobidReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.ReferenceLineAnnotator;
 import de.exciteproject.pdf_evaluation.refextract.RefextReferenceLineAnnotator;
@@ -43,11 +46,20 @@ public class EvaluationExecutor {
             referenceLineAnnotator = new GrobidReferenceLineAnnotator(grobidHomeDirectory);
             break;
         case 2:
+            grobidHomeDirectory = new File(args[8]);
+            File defaultModelDirectory = new File(args[9]);
+            trainFoldBuilder = new GrobidTrainKFoldBuilder(k, idFile);
+            // throws NullPointerException when train=true
+            refExtractTrainer = null;
+            referenceLineAnnotator = new GrobidDefaultReferenceLineAnnotator(grobidHomeDirectory,
+                    defaultModelDirectory);
+            break;
+        case 3:
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
             refExtractTrainer = new CermineRefExtractTrainer();
             referenceLineAnnotator = new CermineReferenceLineAnnotator();
             break;
-        case 3:
+        case 4:
             List<String> features = Arrays.asList(args[8].split(","));
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
             refExtractTrainer = new RefextRefExtractTrainer(features);
@@ -56,7 +68,8 @@ public class EvaluationExecutor {
 
         }
 
-        File tmpFoldDir = new File("/tmp/eval-folds/");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-MM-ss-SSS");
+        File tmpFoldDir = new File("/tmp/eval-folds_" + dateFormat.format(new Date()));
         for (int i = 0; i < k; i++) {
 
             File currentFoldDir = new File(foldTargetDirectory + File.separator + i);
@@ -97,8 +110,6 @@ public class EvaluationExecutor {
                 EvaluationResult.writeAsJson(evaluationResult, currentEvaluationFile);
                 // System.out.println(evaluationResult);
             }
-
-            // TODO: delete tmpFoldDir
         }
     }
 }
