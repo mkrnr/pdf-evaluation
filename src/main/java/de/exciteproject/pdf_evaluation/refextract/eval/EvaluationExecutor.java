@@ -33,6 +33,13 @@ public class EvaluationExecutor {
         File pdfDirectory = new File(args[6]);
         File annotatedFilesDirectory = new File(args[7]);
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-MM-ss-SSS");
+
+        // TODO fix this
+        if (!foldTargetDirectory.getName().contains("2017")) {
+            foldTargetDirectory = new File(foldTargetDirectory.getAbsolutePath() + "_" + dateFormat.format(new Date()));
+        }
+
         KFoldBuilder trainFoldBuilder = null;
 
         KFoldDataset testKFoldDataset = new KFoldDataset(k);
@@ -84,7 +91,6 @@ public class EvaluationExecutor {
             break;
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-MM-ss-SSS");
         File tmpFoldDir = new File("/tmp/eval-folds_" + dateFormat.format(new Date()));
         for (int i = 0; i < k; i++) {
 
@@ -111,7 +117,10 @@ public class EvaluationExecutor {
 
             List<File> testFiles = testKFoldDataset.getTestingFold(i);
             for (File testFile : testFiles) {
-                System.out.println(testFile);
+
+                if (!testFile.getName().contains("332-")) {
+                    continue;
+                }
                 List<String> predictedReferenceLines = referenceLineAnnotator.annotateReferenceLinesFromPDF(testFile);
                 File annotatedFile = new File(annotatedFilesDirectory + File.separator
                         + FilenameUtils.removeExtension(testFile.getName()) + ".csv");
@@ -119,7 +128,7 @@ public class EvaluationExecutor {
 
                 EvaluationResult evaluationResult = referenceEvaluator.evaluateReferenceLines(annotatedReferenceLines,
                         predictedReferenceLines);
-                System.out.println(evaluationResult);
+                // System.out.println(evaluationResult);
                 File currentEvaluationFile = new File(currentFoldEvaluationTargetDir + File.separator
                         + FilenameUtils.removeExtension(testFile.getName()) + ".json");
                 EvaluationResult.writeAsJson(evaluationResult, currentEvaluationFile);

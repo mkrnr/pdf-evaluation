@@ -62,12 +62,18 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
             MockContext.setInitialContext(this.grobidHomeDir.getAbsolutePath(), grobidPropertiesFile.getAbsolutePath());
             GrobidProperties.getInstance();
 
-            System.out.println(">>>>>>>> GROBID_HOME=" + GrobidProperties.get_GROBID_HOME_PATH());
-
             Engine engine = GrobidFactory.getInstance().createEngine();
 
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("/home/mkoerner/332-xml.xml")));
             List<BibDataSet> tei = engine.processReferences(pdfFile, false);
             for (BibDataSet bibDS : tei) {
+                String xmlReference = bibDS.getRawBib();
+                xmlReference = "<bibl>" + xmlReference + "<lb /> </bibl>";
+                xmlReference = xmlReference.replaceAll("\\n", "<lb /> ");
+                // System.out.println(xmlReference);
+                bufferedWriter.write(xmlReference);
+                bufferedWriter.newLine();
+
                 String reference = bibDS.getRawBib().toString();
                 reference = "B-REF\t" + reference;
                 reference = reference.replaceAll("\n", "\nI-REF\t");
@@ -80,6 +86,7 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
                     references.add(referenceLine);
                 }
             }
+            bufferedWriter.close();
         } catch (Exception e) {
             // If an exception is generated, print a stack trace
             e.printStackTrace();
