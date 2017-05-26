@@ -1,6 +1,7 @@
 package de.exciteproject.pdf_evaluation.refextract.eval;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -91,9 +92,25 @@ public class EvaluationExecutor {
             break;
         }
 
+        if (train) {
+            if (!foldTargetDirectory.exists()) {
+                foldTargetDirectory.mkdirs();
+            }
+            File trainingArgsFile = new File(foldTargetDirectory + File.separator + "training-arguments.txt");
+            PrintWriter trainingArgsWriter = new PrintWriter(trainingArgsFile);
+            int i = 0;
+            for (String arg : args) {
+                trainingArgsWriter.println(i + ": " + arg);
+                i++;
+            }
+
+            trainingArgsWriter.println();
+            trainingArgsWriter.println(String.join(" ", args));
+            trainingArgsWriter.close();
+        }
+
         File tmpFoldDir = new File("/tmp/eval-folds_" + dateFormat.format(new Date()));
         for (int i = 0; i < k; i++) {
-
             File currentFoldDir = new File(foldTargetDirectory + File.separator + i);
             File currentFoldTrainingTargetDir = new File(currentFoldDir + File.separator + "models");
 
@@ -117,10 +134,7 @@ public class EvaluationExecutor {
 
             List<File> testFiles = testKFoldDataset.getTestingFold(i);
             for (File testFile : testFiles) {
-
-                if (!testFile.getName().contains("332-")) {
-                    continue;
-                }
+                System.out.println(testFile);
                 List<String> predictedReferenceLines = referenceLineAnnotator.annotateReferenceLinesFromPDF(testFile);
                 File annotatedFile = new File(annotatedFilesDirectory + File.separator
                         + FilenameUtils.removeExtension(testFile.getName()) + ".csv");
@@ -128,7 +142,6 @@ public class EvaluationExecutor {
 
                 EvaluationResult evaluationResult = referenceEvaluator.evaluateReferenceLines(annotatedReferenceLines,
                         predictedReferenceLines);
-                // System.out.println(evaluationResult);
                 File currentEvaluationFile = new File(currentFoldEvaluationTargetDir + File.separator
                         + FilenameUtils.removeExtension(testFile.getName()) + ".json");
                 EvaluationResult.writeAsJson(evaluationResult, currentEvaluationFile);

@@ -11,7 +11,6 @@ import org.grobid.core.data.BibDataSet;
 import org.grobid.core.engines.Engine;
 import org.grobid.core.factory.GrobidFactory;
 import org.grobid.core.mock.MockContext;
-import org.grobid.core.utilities.GrobidProperties;
 
 public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
 
@@ -50,30 +49,26 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
 
     public GrobidReferenceLineAnnotator(File grobidHomeDir) {
         this.grobidHomeDir = grobidHomeDir;
+        File grobidPropertiesFile = new File(
+                this.grobidHomeDir + File.separator + "config" + File.separator + "grobid.properties");
+        try {
+            MockContext.setInitialContext(this.grobidHomeDir.getAbsolutePath(), grobidPropertiesFile.getAbsolutePath());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     @Override
     public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
         List<String> references = new ArrayList<String>();
         try {
-            File grobidPropertiesFile = new File(
-                    this.grobidHomeDir + File.separator + "config" + File.separator + "grobid.properties");
 
-            MockContext.setInitialContext(this.grobidHomeDir.getAbsolutePath(), grobidPropertiesFile.getAbsolutePath());
-            GrobidProperties.getInstance();
+            Engine engine = GrobidFactory.getInstance().getEngine();
 
-            Engine engine = GrobidFactory.getInstance().createEngine();
-
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("/home/mkoerner/332-xml.xml")));
             List<BibDataSet> tei = engine.processReferences(pdfFile, false);
             for (BibDataSet bibDS : tei) {
-                String xmlReference = bibDS.getRawBib();
-                xmlReference = "<bibl>" + xmlReference + "<lb /> </bibl>";
-                xmlReference = xmlReference.replaceAll("\\n", "<lb /> ");
-                // System.out.println(xmlReference);
-                bufferedWriter.write(xmlReference);
-                bufferedWriter.newLine();
-
                 String reference = bibDS.getRawBib().toString();
                 reference = "B-REF\t" + reference;
                 reference = reference.replaceAll("\n", "\nI-REF\t");
@@ -86,18 +81,10 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
                     references.add(referenceLine);
                 }
             }
-            bufferedWriter.close();
         } catch (Exception e) {
             // If an exception is generated, print a stack trace
             e.printStackTrace();
-        } finally {
-            try {
-                MockContext.destroyInitialContext();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
-
         return references;
     }
 
@@ -110,6 +97,13 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
     @Override
     public void initializeModels(File trainingModelsDirectory) throws IOException {
         this.copyModelsToHome(trainingModelsDirectory);
+
+        Engine engine = GrobidFactory.getInstance().getEngine();
+        engine.close();
+        engine = GrobidFactory.getInstance().createEngine();
+        // close parsers or otherwise the model files will not be reloaded
+        engine.getParsers().getSegmentationParser().close();
+        engine.getParsers().getReferenceSegmenterParser().close();
     }
 
     protected void copyModelsToHome(File trainingModelDirectory) throws IOException {
