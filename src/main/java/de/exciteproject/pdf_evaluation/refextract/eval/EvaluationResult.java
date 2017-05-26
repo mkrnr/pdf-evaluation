@@ -15,11 +15,11 @@ public class EvaluationResult {
         JsonUtils.writeToFile(evaluationResult, outputFile);
     }
 
-    private List<String> truePositives;
+    public List<String> truePositives;
 
-    private List<String> falseNegatives;
+    public List<String> falseNegatives;
 
-    private List<String> falsePositives;
+    public List<String> falsePositives;
 
     public EvaluationResult() {
         this.truePositives = new ArrayList<String>();

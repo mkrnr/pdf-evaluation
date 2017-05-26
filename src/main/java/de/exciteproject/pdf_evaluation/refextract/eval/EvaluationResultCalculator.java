@@ -16,22 +16,17 @@ public class EvaluationResultCalculator {
         File evaluationResultFile = new File(args[1]);
 
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
-        evaluationResultCalculator.calculate(evaluationDirectory, evaluationResultFile);
+        evaluationResultCalculator.calculate(evaluationDirectory, evaluationResultFile, 0, 0);
     }
 
-    public void calculate(File evaluationDirectory, File evaluationResultFile) throws IOException {
-        List<File> evaluationDirectoryFiles = FileUtils.listFilesRecursively(evaluationDirectory);
-        EvaluationResult aggregatedEvaluationResult = new EvaluationResult();
-
-        for (File evaluationDirectoryFile : evaluationDirectoryFiles) {
-            if (evaluationDirectoryFile.getName().endsWith(".json")) {
-                aggregatedEvaluationResult.addEvaluationResult(EvaluationResult.readFromJson(evaluationDirectoryFile));
-            }
-        }
+    public void calculate(EvaluationResult evaluationResult, File evaluationResultFile) throws IOException {
         List<String> outputLines = new ArrayList<String>();
-        outputLines.add("precision:\t" + aggregatedEvaluationResult.getPrecision());
-        outputLines.add("recall:\t" + aggregatedEvaluationResult.getRecall());
-        outputLines.add("f1 score:\t" + aggregatedEvaluationResult.getF1Score());
+        outputLines.add("precision:\t" + evaluationResult.getPrecision());
+        outputLines.add("recall:\t" + evaluationResult.getRecall());
+        outputLines.add("f1 score:\t" + evaluationResult.getF1Score());
+        outputLines.add("truePositives:\t" + evaluationResult.truePositives.size());
+        outputLines.add("falsePositives:\t" + evaluationResult.falsePositives.size());
+        outputLines.add("falseNegatives:\t" + evaluationResult.falseNegatives.size());
 
         BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(evaluationResultFile));
         for (String outputLine : outputLines) {
@@ -41,4 +36,30 @@ public class EvaluationResultCalculator {
         }
         outputFileWriter.close();
     }
+
+    public void calculate(File evaluationDirectory, File evaluationResultFile, int additionalFalsePositives,
+            int additionalFalseNegatives) throws IOException {
+        List<File> evaluationDirectoryFiles = FileUtils.listFilesRecursively(evaluationDirectory);
+        EvaluationResult aggregatedEvaluationResult = new EvaluationResult();
+
+        for (File evaluationDirectoryFile : evaluationDirectoryFiles) {
+            if (evaluationDirectoryFile.getName().endsWith(".json")) {
+                aggregatedEvaluationResult.addEvaluationResult(EvaluationResult.readFromJson(evaluationDirectoryFile));
+            }
+        }
+
+        List<String> additionalFalsePositivesList = new ArrayList<String>();
+        for (int i = 0; i < additionalFalsePositives; i++) {
+            additionalFalsePositivesList.add("Dummy\tDummy");
+        }
+        List<String> additionalFalseNegativesList = new ArrayList<String>();
+        for (int i = 0; i < additionalFalseNegatives; i++) {
+            additionalFalseNegativesList.add("Dummy\tDummy");
+
+        }
+        aggregatedEvaluationResult.falsePositives.addAll(additionalFalsePositivesList);
+        aggregatedEvaluationResult.falseNegatives.addAll(additionalFalseNegativesList);
+        this.calculate(aggregatedEvaluationResult, evaluationResultFile);
+    }
+
 }

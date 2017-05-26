@@ -152,7 +152,8 @@ public class EvaluationExecutor {
         // run EvaluationResultcalculator
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
         evaluationResultCalculator.calculate(foldTargetDirectory,
-                new File(foldTargetDirectory + File.separator + "result.txt"));
+                new File(foldTargetDirectory + File.separator + "result.txt"), 0, 0);
+        org.apache.commons.io.FileUtils.deleteDirectory(tmpFoldDir);
     }
 
 }
