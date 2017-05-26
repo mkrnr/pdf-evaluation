@@ -45,7 +45,7 @@ public class GrobidReferenceLineAnnotator extends ReferenceLineAnnotator {
 
     }
 
-    private File grobidHomeDir;
+    protected File grobidHomeDir;
 
     public GrobidReferenceLineAnnotator(File grobidHomeDir) {
         this.grobidHomeDir = grobidHomeDir;

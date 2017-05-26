@@ -39,12 +39,11 @@ public class GrobidDefaultReferenceLineAnnotator extends GrobidReferenceLineAnno
         }
     }
 
-    private File grobidHomeDir;
     private File defaultModelDir;
 
     public GrobidDefaultReferenceLineAnnotator(File grobidHomeDir, File defaultModelDir) {
         super(grobidHomeDir);
-        this.defaultModelDir = new File("pl/edu/icm/cermine/");
+        this.defaultModelDir = defaultModelDir;
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.exciteproject.refext.util.FileUtils;
+import pl.edu.icm.cermine.tools.CharacterUtils;
 
 public class ReferenceEvaluator {
 
@@ -40,6 +41,8 @@ public class ReferenceEvaluator {
 
         }
     }
+
+    private final String hyphenList = String.valueOf(CharacterUtils.DASH_CHARS).replaceAll("-", "") + "-";
 
     public EvaluationResult evaluateMergedReferenceStrings(File correctFile, File predictedFile) throws IOException {
         List<String> correctLines = this.readLines(correctFile);
@@ -78,7 +81,14 @@ public class ReferenceEvaluator {
 
         for (int i = tempPredictedLines.size() - 1; i >= 0; i--) {
             for (int j = tempCorrectLines.size() - 1; j >= 0; j--) {
-                if (tempCorrectLines.get(j).equals(tempPredictedLines.get(i))) {
+                // preprocess lines
+                String tempCorrectLine = tempCorrectLines.get(j);
+                String tempPredictedLine = tempPredictedLines.get(i);
+
+                tempCorrectLine = tempCorrectLine.replaceAll("[" + this.hyphenList + "]", "-");
+                tempPredictedLine = tempPredictedLine.replaceAll("[" + this.hyphenList + "]", "-");
+
+                if (tempCorrectLine.equals(tempPredictedLine)) {
                     matchedLines.add(0, tempPredictedLines.get(i));
                     tempCorrectLines.remove(j);
                     tempPredictedLines.remove(i);

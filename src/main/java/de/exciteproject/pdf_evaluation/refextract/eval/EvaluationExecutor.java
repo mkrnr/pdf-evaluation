@@ -148,6 +148,11 @@ public class EvaluationExecutor {
                 // System.out.println(evaluationResult);
             }
         }
+
+        // run EvaluationResultcalculator
+        EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
+        evaluationResultCalculator.calculate(foldTargetDirectory,
+                new File(foldTargetDirectory + File.separator + "result.txt"));
     }
 
 }
