@@ -81,14 +81,15 @@ public class EvaluationExecutor {
             break;
         case 5:
             List<String> features = Arrays.asList(args[8].split(","));
+            List<String> conjunctions = Arrays.asList(args[9].split(","));
 
             List<String> replacements = new ArrayList<String>();
-            if (args.length > 9) {
+            if (args.length > 10) {
                 replacements = Arrays.asList(args[9].split(","));
             }
 
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
-            refExtractTrainer = new RefextRefExtractTrainer(features, replacements);
+            refExtractTrainer = new RefextRefExtractTrainer(features, replacements, conjunctions);
             referenceLineAnnotator = new RefextReferenceLineAnnotator();
             break;
 

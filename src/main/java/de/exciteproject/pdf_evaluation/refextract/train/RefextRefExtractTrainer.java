@@ -22,22 +22,26 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
         File trainingTargetDirectory = new File(args[1]);
         List<String> featureNames = Arrays.asList(args[2].split(","));
         List<String> replacements = Arrays.asList(args[3].split(","));
+        List<String> conjunctions = Arrays.asList(args[4].split(","));
 
-        RefextRefExtractTrainer refextRefExtractTrainer = new RefextRefExtractTrainer(featureNames, replacements);
+        RefextRefExtractTrainer refextRefExtractTrainer = new RefextRefExtractTrainer(featureNames, replacements,
+                conjunctions);
         refextRefExtractTrainer.train(trainingSourceDirectory, trainingTargetDirectory);
     }
 
     private List<String> featureNames;
     private List<String> replacements;
+    private List<String> conjunctions;
 
     /**
      *
      * @param trainingTargetDirectory:
      *            the directory that CERMINE accesses during training
      */
-    public RefextRefExtractTrainer(List<String> featureNames, List<String> replacements) {
+    public RefextRefExtractTrainer(List<String> featureNames, List<String> replacements, List<String> conjunctions) {
         this.featureNames = featureNames;
         this.replacements = replacements;
+        this.conjunctions = conjunctions;
     }
 
     @Override
@@ -46,7 +50,7 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
 
         // run training for metadata, body, and category models
         ReferenceExtractorTrainer referenceExtractorTrainer = new ReferenceExtractorTrainer(this.featureNames,
-                this.replacements);
+                this.replacements, this.conjunctions);
         InstanceList trainingInstances = referenceExtractorTrainer.buildInstanceListFromDir(trainingSourceDirectory);
 
         referenceExtractorTrainer.addStartState();
