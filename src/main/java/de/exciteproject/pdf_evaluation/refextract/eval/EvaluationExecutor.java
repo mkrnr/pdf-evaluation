@@ -3,6 +3,7 @@ package de.exciteproject.pdf_evaluation.refextract.eval;
 import java.io.File;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -81,7 +82,10 @@ public class EvaluationExecutor {
         case 5:
             List<String> features = Arrays.asList(args[8].split(","));
 
-            List<String> replacements = Arrays.asList(args[9].split(","));
+            List<String> replacements = new ArrayList<String>();
+            if (args.length > 9) {
+                replacements = Arrays.asList(args[9].split(","));
+            }
 
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
             refExtractTrainer = new RefextRefExtractTrainer(features, replacements);
