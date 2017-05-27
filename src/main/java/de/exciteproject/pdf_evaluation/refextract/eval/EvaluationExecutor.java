@@ -35,10 +35,12 @@ public class EvaluationExecutor {
         File annotatedFilesDirectory = new File(args[7]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-MM-ss-SSS");
+        Date currentDate = new Date();
 
         // TODO fix this
         if (!foldTargetDirectory.getName().contains("2017")) {
-            foldTargetDirectory = new File(foldTargetDirectory.getAbsolutePath() + "_" + dateFormat.format(new Date()));
+            foldTargetDirectory = new File(
+                    foldTargetDirectory.getAbsolutePath() + "_" + dateFormat.format(currentDate));
         }
 
         KFoldBuilder trainFoldBuilder = null;
@@ -78,8 +80,11 @@ public class EvaluationExecutor {
             break;
         case 5:
             List<String> features = Arrays.asList(args[8].split(","));
+
+            List<String> replacements = Arrays.asList(args[9].split(","));
+
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
-            refExtractTrainer = new RefextRefExtractTrainer(features);
+            refExtractTrainer = new RefextRefExtractTrainer(features, replacements);
             referenceLineAnnotator = new RefextReferenceLineAnnotator();
             break;
 
@@ -109,7 +114,7 @@ public class EvaluationExecutor {
             trainingArgsWriter.close();
         }
 
-        File tmpFoldDir = new File("/tmp/eval-folds_" + dateFormat.format(new Date()));
+        File tmpFoldDir = new File("/tmp/eval-folds_" + dateFormat.format(currentDate));
         for (int i = 0; i < k; i++) {
             File currentFoldDir = new File(foldTargetDirectory + File.separator + i);
             File currentFoldTrainingTargetDir = new File(currentFoldDir + File.separator + "models");
