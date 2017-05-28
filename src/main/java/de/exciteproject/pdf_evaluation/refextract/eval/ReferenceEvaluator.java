@@ -14,23 +14,29 @@ import pl.edu.icm.cermine.tools.CharacterUtils;
 public class ReferenceEvaluator {
 
     public static void main(String[] args) throws IOException {
-        File correctDir = new File(args[0]);
-        File predictedDir = new File(args[1]);
-        File outputDir = new File(args[2]);
+        int mode = Integer.parseInt(args[0]);
+        File correctDir = new File(args[1]);
+        File predictedDir = new File(args[2]);
+        File outputDir = new File(args[3]);
 
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }
-        // load configuration file specifying the retrained SVM models for zone
-        // classification
 
         ReferenceEvaluator referenceEvaluator = new ReferenceEvaluator();
         for (File predictedFile : predictedDir.listFiles()) {
             File correctFile = new File(correctDir.getAbsolutePath() + File.separator + predictedFile.getName());
             File outputFile = new File(outputDir.getAbsolutePath() + File.separator + correctFile.getName());
             System.out.println("check: " + correctFile.getName());
-            EvaluationResult evaluationResult = referenceEvaluator.evaluateMergedReferenceStrings(correctFile,
-                    predictedFile);
+            EvaluationResult evaluationResult = new EvaluationResult();
+            switch (mode) {
+            case 0:
+                evaluationResult = referenceEvaluator.evaluateReferenceLines(correctFile, predictedFile);
+                break;
+            case 1:
+                evaluationResult = referenceEvaluator.evaluateMergedReferenceStrings(correctFile, predictedFile);
+                break;
+            }
             // EvaluationResult evaluationResult =
             // referenceEvaluator.evaluateReferenceLines(correctFile,
             // predictedFile);
@@ -117,7 +123,7 @@ public class ReferenceEvaluator {
                 reference = referenceLine.replaceFirst("B-REF\t", "");
             }
             if (referenceLine.startsWith("I-REF\t")) {
-                reference += referenceLine.replaceFirst("I-REF\t", "");
+                reference += " " + referenceLine.replaceFirst("I-REF\t", "");
             }
         }
         return references;

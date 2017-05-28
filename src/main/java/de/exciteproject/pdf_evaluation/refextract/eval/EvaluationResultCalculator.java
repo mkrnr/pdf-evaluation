@@ -16,7 +16,9 @@ public class EvaluationResultCalculator {
         File evaluationResultFile = new File(args[1]);
 
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
-        evaluationResultCalculator.calculate(evaluationDirectory, evaluationResultFile, 0, 0);
+        evaluationResultCalculator.calculate(FileUtils.listFilesRecursively(evaluationDirectory), evaluationResultFile,
+                0, 0);
+
     }
 
     public void calculate(EvaluationResult evaluationResult, File evaluationResultFile) throws IOException {
@@ -37,12 +39,11 @@ public class EvaluationResultCalculator {
         outputFileWriter.close();
     }
 
-    public void calculate(File evaluationDirectory, File evaluationResultFile, int additionalFalsePositives,
+    public void calculate(List<File> evaluationFiles, File evaluationResultFile, int additionalFalsePositives,
             int additionalFalseNegatives) throws IOException {
-        List<File> evaluationDirectoryFiles = FileUtils.listFilesRecursively(evaluationDirectory);
         EvaluationResult aggregatedEvaluationResult = new EvaluationResult();
 
-        for (File evaluationDirectoryFile : evaluationDirectoryFiles) {
+        for (File evaluationDirectoryFile : evaluationFiles) {
             if (evaluationDirectoryFile.getName().endsWith(".json")) {
                 aggregatedEvaluationResult.addEvaluationResult(EvaluationResult.readFromJson(evaluationDirectoryFile));
             }

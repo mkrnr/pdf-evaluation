@@ -34,6 +34,7 @@ public class EvaluationExecutor {
         File foldTargetDirectory = new File(args[5]);
         File pdfDirectory = new File(args[6]);
         File annotatedFilesDirectory = new File(args[7]);
+        int evaluationMode = Integer.parseInt(args[8]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-MM-ss-SSS");
         Date currentDate = new Date();
@@ -53,14 +54,14 @@ public class EvaluationExecutor {
         ReferenceEvaluator referenceEvaluator = new ReferenceEvaluator();
         switch (mode) {
         case 1:
-            File grobidHomeDirectory = new File(args[8]);
+            File grobidHomeDirectory = new File(args[9]);
             trainFoldBuilder = new GrobidTrainKFoldBuilder(k, idFile);
             refExtractTrainer = new GrobidRefExtractTrainer(grobidHomeDirectory);
             referenceLineAnnotator = new GrobidReferenceLineAnnotator(grobidHomeDirectory);
             break;
         case 2:
-            grobidHomeDirectory = new File(args[8]);
-            File defaultModelDirectory = new File(args[9]);
+            grobidHomeDirectory = new File(args[9]);
+            File defaultModelDirectory = new File(args[10]);
             trainFoldBuilder = new GrobidTrainKFoldBuilder(k, idFile);
             // throws NullPointerException when train=true
             refExtractTrainer = null;
@@ -80,21 +81,23 @@ public class EvaluationExecutor {
             referenceLineAnnotator = new CermineDefaultReferenceLineAnnotator();
             break;
         case 5:
-            List<String> features = Arrays.asList(args[8].split(","));
-            List<String> conjunctions = Arrays.asList(args[9].split(","));
+            List<String> features = Arrays.asList(args[9].split(","));
+            List<String> conjunctions = Arrays.asList(args[10].split(","));
 
+            double gaussianPriorVariance = Double.parseDouble(args[11]);
             List<String> replacements = new ArrayList<String>();
-            if (args.length > 10) {
-                replacements = Arrays.asList(args[9].split(","));
+            if (args.length > 12) {
+                replacements = Arrays.asList(args[12].split(","));
             }
 
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
-            refExtractTrainer = new RefextRefExtractTrainer(features, replacements, conjunctions);
+            refExtractTrainer = new RefextRefExtractTrainer(features, replacements, conjunctions,
+                    gaussianPriorVariance);
             referenceLineAnnotator = new RefextReferenceLineAnnotator();
             break;
 
         case 6:
-            File citeExtractFile = new File(args[8]);
+            File citeExtractFile = new File(args[9]);
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
             // throws NullPointerException when train=true
             refExtractTrainer = null;
@@ -118,6 +121,17 @@ public class EvaluationExecutor {
             trainingArgsWriter.println(String.join(" ", args));
             trainingArgsWriter.close();
         }
+        String evaluationName = "";
+        switch (evaluationMode) {
+        case 0:
+            evaluationName = "line";
+            break;
+        case 1:
+            evaluationName = "ref";
+            break;
+        }
+
+        List<File> filesToEvaluate = new ArrayList<File>();
 
         File tmpFoldDir = new File("/tmp/eval-folds_" + dateFormat.format(currentDate));
         for (int i = 0; i < k; i++) {
@@ -140,7 +154,8 @@ public class EvaluationExecutor {
             referenceLineAnnotator.initializeModels(currentFoldTrainingTargetDir);
 
             System.out.println(foldTargetDirectory);
-            File currentFoldEvaluationTargetDir = new File(currentFoldDir + File.separator + "evaluations");
+            File currentFoldEvaluationTargetDir = new File(
+                    currentFoldDir + File.separator + evaluationName + "-evaluations");
 
             List<File> testFiles = testKFoldDataset.getTestingFold(i);
             for (File testFile : testFiles) {
@@ -150,19 +165,29 @@ public class EvaluationExecutor {
                         + FilenameUtils.removeExtension(testFile.getName()) + ".csv");
                 List<String> annotatedReferenceLines = Arrays.asList(FileUtils.readFile(annotatedFile).split("\\n"));
 
-                EvaluationResult evaluationResult = referenceEvaluator.evaluateReferenceLines(annotatedReferenceLines,
-                        predictedReferenceLines);
+                EvaluationResult evaluationResult = new EvaluationResult();
+                switch (evaluationMode) {
+                case 0:
+                    evaluationResult = referenceEvaluator.evaluateReferenceLines(annotatedReferenceLines,
+                            predictedReferenceLines);
+                    break;
+                case 1:
+                    evaluationResult = referenceEvaluator.evaluateMergedReferenceStrings(annotatedReferenceLines,
+                            predictedReferenceLines);
+                    break;
+                }
                 File currentEvaluationFile = new File(currentFoldEvaluationTargetDir + File.separator
                         + FilenameUtils.removeExtension(testFile.getName()) + ".json");
                 EvaluationResult.writeAsJson(evaluationResult, currentEvaluationFile);
                 // System.out.println(evaluationResult);
             }
+            filesToEvaluate.addAll(Arrays.asList(currentFoldEvaluationTargetDir.listFiles()));
         }
 
         // run EvaluationResultcalculator
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
-        evaluationResultCalculator.calculate(foldTargetDirectory,
-                new File(foldTargetDirectory + File.separator + "result.txt"), 0, 0);
+        evaluationResultCalculator.calculate(filesToEvaluate,
+                new File(foldTargetDirectory + File.separator + evaluationName + "-results.txt"), 0, 0);
         org.apache.commons.io.FileUtils.deleteDirectory(tmpFoldDir);
     }
 
