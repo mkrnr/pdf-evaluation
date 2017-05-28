@@ -126,6 +126,10 @@ public class ReferenceEvaluator {
                 reference += " " + referenceLine.replaceFirst("I-REF\t", "");
             }
         }
+        if (!reference.isEmpty()) {
+            references.add(reference);
+        }
+
         return references;
     }
 
