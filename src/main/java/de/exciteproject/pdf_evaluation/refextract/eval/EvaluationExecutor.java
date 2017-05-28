@@ -36,7 +36,7 @@ public class EvaluationExecutor {
         File annotatedFilesDirectory = new File(args[7]);
         int evaluationMode = Integer.parseInt(args[8]);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-MM-ss-SSS");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS");
         Date currentDate = new Date();
 
         // TODO fix this
@@ -85,14 +85,15 @@ public class EvaluationExecutor {
             List<String> conjunctions = Arrays.asList(args[10].split(","));
 
             double gaussianPriorVariance = Double.parseDouble(args[11]);
+            String addStatesName = args[12];
             List<String> replacements = new ArrayList<String>();
-            if (args.length > 12) {
-                replacements = Arrays.asList(args[12].split(","));
+            if (args.length > 13) {
+                replacements = Arrays.asList(args[13].split(","));
             }
 
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
-            refExtractTrainer = new RefextRefExtractTrainer(features, replacements, conjunctions,
-                    gaussianPriorVariance);
+            refExtractTrainer = new RefextRefExtractTrainer(features, replacements, conjunctions, gaussianPriorVariance,
+                    addStatesName);
             referenceLineAnnotator = new RefextReferenceLineAnnotator();
             break;
 

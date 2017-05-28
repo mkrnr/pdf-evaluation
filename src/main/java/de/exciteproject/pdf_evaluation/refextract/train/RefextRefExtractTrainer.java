@@ -26,7 +26,7 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
         double gaussianPriorVariance = Double.parseDouble(args[5]);
 
         RefextRefExtractTrainer refextRefExtractTrainer = new RefextRefExtractTrainer(featureNames, replacements,
-                conjunctions, gaussianPriorVariance);
+                conjunctions, gaussianPriorVariance, "ThreeQuarterLabels");
         refextRefExtractTrainer.train(trainingSourceDirectory, trainingTargetDirectory);
     }
 
@@ -34,6 +34,7 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
     private List<String> replacements;
     private List<String> conjunctions;
     private double gaussianPriorVariance;
+    private String addStatesName;
 
     /**
      *
@@ -41,11 +42,12 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
      *            the directory that CERMINE accesses during training
      */
     public RefextRefExtractTrainer(List<String> featureNames, List<String> replacements, List<String> conjunctions,
-            double gaussianPriorVariance) {
+            double gaussianPriorVariance, String addStatesName) {
         this.featureNames = featureNames;
         this.replacements = replacements;
         this.conjunctions = conjunctions;
         this.gaussianPriorVariance = gaussianPriorVariance;
+        this.addStatesName = addStatesName;
     }
 
     @Override
@@ -58,10 +60,21 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
         InstanceList trainingInstances = referenceExtractorTrainer.buildInstanceListFromDir(trainingSourceDirectory);
 
         referenceExtractorTrainer.crf.addStartState();
-        referenceExtractorTrainer.crf.addStatesForThreeQuarterLabelsConnectedAsIn(trainingInstances);
+        switch (this.addStatesName) {
+        case "ThreeQuarterLabels":
+            referenceExtractorTrainer.crf.addStatesForThreeQuarterLabelsConnectedAsIn(trainingInstances);
+            break;
+        case "BiLabels":
+            referenceExtractorTrainer.crf.addStatesForBiLabelsConnectedAsIn(trainingInstances);
+            break;
+        case "Labels":
+            referenceExtractorTrainer.crf.addStatesForLabelsConnectedAsIn(trainingInstances);
+            break;
+        case "HalfLabels":
+            referenceExtractorTrainer.crf.addStatesForHalfLabelsConnectedAsIn(trainingInstances);
+            break;
+        }
         referenceExtractorTrainer.setCRFTrainerByLabelLikelihood(this.gaussianPriorVariance);
-        // referenceExtractorTrainer.setCRFTrainerByL1LabelLikelihood(20.0);
-        // referenceExtractorTrainer.setCRFTrainerByL1LabelLikelihood(0.75);
 
         CRF crf = referenceExtractorTrainer.train(trainingInstances, trainingInstances);
         File modelOutputFile = new File(trainingTargetDirectory + File.separator + "model.ser");
