@@ -65,7 +65,7 @@ public class EvaluationResultCalculator {
                 EvaluationResult evaluationResult = EvaluationResult.readFromJson(evaluationDirectoryFile);
                 this.filterEvaluationResult(evaluationResult, filterRegex);
                 // TODO add addAdditionalEntries
-                evaluationResults.add(EvaluationResult.readFromJson(evaluationDirectoryFile));
+                evaluationResults.add(evaluationResult);
             }
         }
 
