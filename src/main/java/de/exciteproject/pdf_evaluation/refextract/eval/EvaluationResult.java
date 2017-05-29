@@ -42,15 +42,31 @@ public class EvaluationResult {
     public double getF1Score() {
         double precision = this.getPrecision();
         double recall = this.getRecall();
-        return (2 * (precision * recall)) / (precision + recall);
+        Double f1Score = (2 * (precision * recall)) / (precision + recall);
+        if (f1Score.isNaN()) {
+            return 0;
+        } else {
+            return f1Score;
+        }
     }
 
     public double getPrecision() {
-        return (double) this.truePositives.size() / (this.truePositives.size() + this.falsePositives.size());
+        Double precision = (double) this.truePositives.size()
+                / (this.truePositives.size() + this.falsePositives.size());
+        if (precision.isNaN()) {
+            return 0;
+        } else {
+            return precision;
+        }
     }
 
     public double getRecall() {
-        return (double) this.truePositives.size() / (this.truePositives.size() + this.falseNegatives.size());
+        Double recall = (double) this.truePositives.size() / (this.truePositives.size() + this.falseNegatives.size());
+        if (recall.isNaN()) {
+            return 0;
+        } else {
+            return recall;
+        }
     }
 
     @Override
