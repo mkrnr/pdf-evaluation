@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import org.grobid.core.engines.Engine;
+import org.grobid.core.factory.GrobidFactory;
+
 public class GrobidDefaultReferenceLineAnnotator extends GrobidReferenceLineAnnotator {
 
     public static void main(String[] args) throws IOException {
@@ -49,6 +52,13 @@ public class GrobidDefaultReferenceLineAnnotator extends GrobidReferenceLineAnno
     @Override
     public void initializeModels(File trainingModelsDirectory) throws IOException {
         this.copyModelsToHome(trainingModelsDirectory);
+        Engine engine = GrobidFactory.getInstance().getEngine();
+        engine.close();
+        engine = GrobidFactory.getInstance().createEngine();
+        // close parsers or otherwise the model files will not be reloaded
+        engine.getParsers().getSegmentationParser().close();
+        engine.getParsers().getReferenceSegmenterParser().close();
+
     }
 
     /**

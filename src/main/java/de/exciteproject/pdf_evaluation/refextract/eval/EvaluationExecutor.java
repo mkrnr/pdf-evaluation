@@ -39,8 +39,7 @@ public class EvaluationExecutor {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS");
         Date currentDate = new Date();
 
-        // TODO fix this
-        if (!foldTargetDirectory.getName().contains("2017")) {
+        if (!foldTargetDirectory.getName().matches(".*\\d\\d\\d\\d-\\d\\d-\\d\\d_\\d\\d-\\d\\d-\\d\\d-\\d\\d\\d")) {
             foldTargetDirectory = new File(
                     foldTargetDirectory.getAbsolutePath() + "_" + dateFormat.format(currentDate));
         }
@@ -86,14 +85,15 @@ public class EvaluationExecutor {
 
             double gaussianPriorVariance = Double.parseDouble(args[11]);
             String addStatesName = args[12];
+            String trainerName = args[13];
             List<String> replacements = new ArrayList<String>();
-            if (args.length > 13) {
-                replacements = Arrays.asList(args[13].split(","));
+            if (args.length > 14) {
+                replacements = Arrays.asList(args[14].split(","));
             }
 
             trainFoldBuilder = new SimpleKFoldBuilder(k, idFile);
             refExtractTrainer = new RefextRefExtractTrainer(features, replacements, conjunctions, gaussianPriorVariance,
-                    addStatesName);
+                    addStatesName, trainerName);
             referenceLineAnnotator = new RefextReferenceLineAnnotator();
             break;
 

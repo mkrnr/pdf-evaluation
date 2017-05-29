@@ -26,15 +26,16 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
         double gaussianPriorVariance = Double.parseDouble(args[5]);
 
         RefextRefExtractTrainer refextRefExtractTrainer = new RefextRefExtractTrainer(featureNames, replacements,
-                conjunctions, gaussianPriorVariance, "ThreeQuarterLabels");
+                conjunctions, gaussianPriorVariance, "ThreeQuarterLabels", "ByL1LabelLikelihood");
         refextRefExtractTrainer.train(trainingSourceDirectory, trainingTargetDirectory);
     }
 
     private List<String> featureNames;
     private List<String> replacements;
     private List<String> conjunctions;
-    private double gaussianPriorVariance;
+    private double trainerWeight;
     private String addStatesName;
+    private String trainerName;
 
     /**
      *
@@ -42,12 +43,13 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
      *            the directory that CERMINE accesses during training
      */
     public RefextRefExtractTrainer(List<String> featureNames, List<String> replacements, List<String> conjunctions,
-            double gaussianPriorVariance, String addStatesName) {
+            double trainerWeight, String addStatesName, String trainerName) {
         this.featureNames = featureNames;
         this.replacements = replacements;
         this.conjunctions = conjunctions;
-        this.gaussianPriorVariance = gaussianPriorVariance;
+        this.trainerWeight = trainerWeight;
         this.addStatesName = addStatesName;
+        this.trainerName = trainerName;
     }
 
     @Override
@@ -74,7 +76,15 @@ public class RefextRefExtractTrainer extends RefExtractTrainer {
             referenceExtractorTrainer.crf.addStatesForHalfLabelsConnectedAsIn(trainingInstances);
             break;
         }
-        referenceExtractorTrainer.setCRFTrainerByLabelLikelihood(this.gaussianPriorVariance);
+
+        switch (this.trainerName) {
+        case "ByLabelLikelihood":
+            referenceExtractorTrainer.setCRFTrainerByLabelLikelihood(this.trainerWeight);
+            break;
+        case "ByL1LabelLikelihood":
+            referenceExtractorTrainer.setCRFTrainerByL1LabelLikelihood(this.trainerWeight);
+            break;
+        }
 
         CRF crf = referenceExtractorTrainer.train(trainingInstances, trainingInstances);
         File modelOutputFile = new File(trainingTargetDirectory + File.separator + "model.ser");
