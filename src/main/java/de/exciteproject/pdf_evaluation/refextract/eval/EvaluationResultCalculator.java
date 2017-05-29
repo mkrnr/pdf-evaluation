@@ -83,14 +83,16 @@ public class EvaluationResultCalculator {
         // calculate macro metrics
         double macroPrecision = 0.0;
         double macroRecall = 0.0;
+        double macroF1Score = 0.0;
         for (EvaluationResult evaluationResult : evaluationResults) {
             System.out.println(evaluationResult.getPrecision());
             macroPrecision += evaluationResult.getPrecision();
             macroRecall += evaluationResult.getRecall();
+            macroF1Score += evaluationResult.getF1Score();
         }
         macroPrecision = macroPrecision / evaluationResults.size();
         macroRecall = macroRecall / evaluationResults.size();
-        double macroF1Score = (2 * (macroPrecision * macroRecall)) / (macroPrecision + macroRecall);
+        macroF1Score = macroF1Score / evaluationResults.size();
 
         List<String> outputLines = new ArrayList<String>();
 
