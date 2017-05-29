@@ -188,7 +188,7 @@ public class EvaluationExecutor {
         // run EvaluationResultcalculator
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
         evaluationResultCalculator.calculate(filesToEvaluate,
-                new File(foldTargetDirectory + File.separator + evaluationName + "-results.txt"), null, 0, 0);
+                new File(foldTargetDirectory + File.separator + evaluationName + "-results.txt"), null, "O");
         org.apache.commons.io.FileUtils.deleteDirectory(tmpFoldDir);
     }
 
