@@ -6,7 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.FilenameUtils;
 
 public class EvaluationResultCalculator {
 
@@ -15,11 +19,10 @@ public class EvaluationResultCalculator {
         File evaluationResultFile = new File(args[1]);
         String evaluationsDirectoryName = args[2];
         // TODO parse map as input: filename;count,filename;count
-        int additionalFalseNegatives = Integer.parseInt(args[3]);
-        int additionalFalsePositives = Integer.parseInt(args[4]);
+        String additionalFalseNegatives = args[3];
         String filterRegex = null;
-        if (args.length > 5) {
-            filterRegex = args[5];
+        if (args.length > 4) {
+            filterRegex = args[4];
         }
 
         List<File> evaluationFiles = new ArrayList<File>();
@@ -35,36 +38,42 @@ public class EvaluationResultCalculator {
 
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
         evaluationResultCalculator.calculate(evaluationFiles, evaluationResultFile, filterRegex,
-                additionalFalseNegatives, additionalFalsePositives);
+                additionalFalseNegatives);
 
-    }
-
-    public void addAdditionalEntries(EvaluationResult evaluationResult, int additionalFalseNegatives,
-            int additionalFalsePositives) throws IOException {
-
-        List<String> additionalFalseNegativesList = new ArrayList<String>();
-        for (int i = 0; i < additionalFalseNegatives; i++) {
-            additionalFalseNegativesList.add("Dummy");
-
-        }
-        List<String> additionalFalsePositivesList = new ArrayList<String>();
-        for (int i = 0; i < additionalFalsePositives; i++) {
-            additionalFalsePositivesList.add("Dummy");
-        }
-        evaluationResult.falseNegatives.addAll(additionalFalseNegativesList);
-        evaluationResult.falsePositives.addAll(additionalFalsePositivesList);
     }
 
     public void calculate(List<File> evaluationFiles, File evaluationResultFile, String filterRegex,
-            int additionalFalseNegatives, int additionalFalsePositives) throws IOException {
+            String additionalFalseNegatives) throws IOException {
 
         List<EvaluationResult> evaluationResults = new ArrayList<EvaluationResult>();
-        for (File evaluationDirectoryFile : evaluationFiles) {
-            if (evaluationDirectoryFile.getName().endsWith(".json")) {
 
-                EvaluationResult evaluationResult = EvaluationResult.readFromJson(evaluationDirectoryFile);
+        String[] keyValuePairsSplit = new String[0];
+        if (additionalFalseNegatives.contains(",")) {
+            keyValuePairsSplit = additionalFalseNegatives.split(",");
+        }
+        Map<String, Integer> valuesToAddMap = new HashMap<String, Integer>();
+        for (String keyValuePair : keyValuePairsSplit) {
+            String[] keyValuePairSplit = keyValuePair.split(";");
+            valuesToAddMap.put(keyValuePairSplit[0], Integer.parseInt(keyValuePairSplit[1]));
+        }
+
+        for (File evaluationFile : evaluationFiles) {
+            if (evaluationFile.getName().endsWith(".json")) {
+
+                EvaluationResult evaluationResult = EvaluationResult.readFromJson(evaluationFile);
+                System.out.println();
+                System.out.println(evaluationResult.truePositives.size());
                 this.filterEvaluationResult(evaluationResult, filterRegex);
-                // TODO add addAdditionalEntries
+                System.out.println(evaluationResult.truePositives.size());
+                System.out.println();
+
+                String evaluationFileNameWithoutEnding = FilenameUtils.removeExtension(evaluationFile.getName());
+                if (valuesToAddMap.containsKey(evaluationFileNameWithoutEnding)) {
+                    System.out.println(valuesToAddMap.get(evaluationFileNameWithoutEnding));
+                    for (int i = 0; i < valuesToAddMap.get(evaluationFileNameWithoutEnding); i++) {
+                        evaluationResult.falseNegatives.add("Dummy");
+                    }
+                }
                 evaluationResults.add(evaluationResult);
             }
         }
@@ -72,20 +81,15 @@ public class EvaluationResultCalculator {
         // calculate micro metrics
         EvaluationResult aggregatedEvaluationResult = new EvaluationResult();
 
-        for (File evaluationDirectoryFile : evaluationFiles) {
-            if (evaluationDirectoryFile.getName().endsWith(".json")) {
-                aggregatedEvaluationResult.addEvaluationResult(EvaluationResult.readFromJson(evaluationDirectoryFile));
-            }
+        for (EvaluationResult evaluationResult : evaluationResults) {
+            aggregatedEvaluationResult.addEvaluationResult(evaluationResult);
         }
-
-        this.addAdditionalEntries(aggregatedEvaluationResult, additionalFalseNegatives, additionalFalsePositives);
 
         // calculate macro metrics
         double macroPrecision = 0.0;
         double macroRecall = 0.0;
         double macroF1Score = 0.0;
         for (EvaluationResult evaluationResult : evaluationResults) {
-            System.out.println(evaluationResult.getPrecision());
             macroPrecision += evaluationResult.getPrecision();
             macroRecall += evaluationResult.getRecall();
             macroF1Score += evaluationResult.getF1Score();
@@ -98,11 +102,8 @@ public class EvaluationResultCalculator {
 
         outputLines.add("Name\tValue");
         outputLines.add("filterRegex\t" + filterRegex);
-        if (additionalFalseNegatives > 0) {
+        if (keyValuePairsSplit.length > 0) {
             outputLines.add("addedFalseNegatives\t" + additionalFalseNegatives);
-        }
-        if (additionalFalsePositives > 0) {
-            outputLines.add("addedFalsePositives\t" + additionalFalsePositives);
         }
         outputLines.add("micro precision\t" + aggregatedEvaluationResult.getPrecision());
         outputLines.add("micro recall\t" + aggregatedEvaluationResult.getRecall());
