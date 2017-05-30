@@ -6,9 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -16,13 +20,11 @@ public class EvaluationResultCalculator {
 
     public static void main(String[] args) throws IOException {
         File foldsDirectory = new File(args[0]);
-        File evaluationResultFile = new File(args[1]);
+        String evaluationResultFileName = args[1];
         String evaluationsDirectoryName = args[2];
-        // TODO parse map as input: filename;count,filename;count
-        String additionalFalseNegatives = args[3];
         String filterRegex = null;
-        if (args.length > 4) {
-            filterRegex = args[4];
+        if (args.length > 3) {
+            filterRegex = args[3];
         }
 
         List<File> evaluationFiles = new ArrayList<File>();
@@ -37,43 +39,28 @@ public class EvaluationResultCalculator {
         }
 
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
-        evaluationResultCalculator.calculate(evaluationFiles, evaluationResultFile, filterRegex,
-                additionalFalseNegatives);
+        evaluationResultCalculator.calculate(evaluationFiles, foldsDirectory, evaluationResultFileName, filterRegex);
 
     }
 
-    public void calculate(List<File> evaluationFiles, File evaluationResultFile, String filterRegex,
-            String additionalFalseNegatives) throws IOException {
+    public void calculate(List<File> evaluationFiles, File evaluationResultDirectory, String evaluationResultFileSuffix,
+            String filterRegex) throws IOException {
 
         List<EvaluationResult> evaluationResults = new ArrayList<EvaluationResult>();
 
-        String[] keyValuePairsSplit = new String[0];
-        if (additionalFalseNegatives.contains(",")) {
-            keyValuePairsSplit = additionalFalseNegatives.split(",");
-        }
-        Map<String, Integer> valuesToAddMap = new HashMap<String, Integer>();
-        for (String keyValuePair : keyValuePairsSplit) {
-            String[] keyValuePairSplit = keyValuePair.split(";");
-            valuesToAddMap.put(keyValuePairSplit[0], Integer.parseInt(keyValuePairSplit[1]));
-        }
-
+        Map<String, Double> precisionMap = new HashMap<String, Double>();
+        Map<String, Double> recallMap = new HashMap<String, Double>();
+        Map<String, Double> f1ScoreMap = new HashMap<String, Double>();
         for (File evaluationFile : evaluationFiles) {
             if (evaluationFile.getName().endsWith(".json")) {
-
                 EvaluationResult evaluationResult = EvaluationResult.readFromJson(evaluationFile);
-                System.out.println();
-                System.out.println(evaluationResult.truePositives.size());
                 this.filterEvaluationResult(evaluationResult, filterRegex);
-                System.out.println(evaluationResult.truePositives.size());
-                System.out.println();
 
-                String evaluationFileNameWithoutEnding = FilenameUtils.removeExtension(evaluationFile.getName());
-                if (valuesToAddMap.containsKey(evaluationFileNameWithoutEnding)) {
-                    System.out.println(valuesToAddMap.get(evaluationFileNameWithoutEnding));
-                    for (int i = 0; i < valuesToAddMap.get(evaluationFileNameWithoutEnding); i++) {
-                        evaluationResult.falseNegatives.add("Dummy");
-                    }
-                }
+                String evaluationResultName = FilenameUtils.removeExtension(evaluationFile.getName());
+                precisionMap.put(evaluationResultName, evaluationResult.getPrecision());
+                recallMap.put(evaluationResultName, evaluationResult.getRecall());
+                f1ScoreMap.put(evaluationResultName, evaluationResult.getF1Score());
+
                 evaluationResults.add(evaluationResult);
             }
         }
@@ -102,9 +89,6 @@ public class EvaluationResultCalculator {
 
         outputLines.add("Name\tValue");
         outputLines.add("filterRegex\t" + filterRegex);
-        if (keyValuePairsSplit.length > 0) {
-            outputLines.add("addedFalseNegatives\t" + additionalFalseNegatives);
-        }
         outputLines.add("micro precision\t" + aggregatedEvaluationResult.getPrecision());
         outputLines.add("micro recall\t" + aggregatedEvaluationResult.getRecall());
         outputLines.add("micro f1 score\t" + aggregatedEvaluationResult.getF1Score());
@@ -116,14 +100,21 @@ public class EvaluationResultCalculator {
         outputLines.add("truePositives\t" + aggregatedEvaluationResult.truePositives.size());
         outputLines.add("falseNegatives\t" + aggregatedEvaluationResult.falseNegatives.size());
         outputLines.add("falsePositives\t" + aggregatedEvaluationResult.falsePositives.size());
-
-        BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(evaluationResultFile));
         for (String outputLine : outputLines) {
             System.out.println(outputLine);
-            outputFileWriter.write(outputLine);
-            outputFileWriter.newLine();
         }
-        outputFileWriter.close();
+
+        File statisticsOutputFile = new File(evaluationResultDirectory + File.separator + evaluationResultFileSuffix);
+
+        this.writeToFile(outputLines, statisticsOutputFile);
+
+        this.writeToFile(this.sortedSetToList(this.entriesSortedByValues(precisionMap)),
+                new File(evaluationResultDirectory + File.separator + "precision-" + evaluationResultFileSuffix));
+        this.writeToFile(this.sortedSetToList(this.entriesSortedByValues(recallMap)),
+                new File(evaluationResultDirectory + File.separator + "recall-" + evaluationResultFileSuffix));
+        this.writeToFile(this.sortedSetToList(this.entriesSortedByValues(f1ScoreMap)),
+                new File(evaluationResultDirectory + File.separator + "f1Score-" + evaluationResultFileSuffix));
+
     }
 
     private void filterEvaluationResult(EvaluationResult evaluationResult, String filterRegex) {
@@ -145,5 +136,37 @@ public class EvaluationResultCalculator {
                 }
             }
         }
+    }
+
+    private List<String> sortedSetToList(SortedSet<Entry<String, Double>> sortedSet) {
+        List<String> list = new ArrayList<String>();
+        for (Entry<String, Double> entry : sortedSet) {
+            list.add(entry.getKey() + "\t" + entry.getValue());
+        }
+        return list;
+
+    }
+
+    private void writeToFile(List<String> list, File outputFile) throws IOException {
+        BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(outputFile));
+        for (String outputLine : list) {
+            outputFileWriter.write(outputLine);
+            outputFileWriter.newLine();
+        }
+        outputFileWriter.close();
+
+    }
+
+    // from: https://stackoverflow.com/a/2864923/2174538
+    <K, V extends Comparable<? super V>> SortedSet<Map.Entry<K, V>> entriesSortedByValues(Map<K, V> map) {
+        SortedSet<Map.Entry<K, V>> sortedEntries = new TreeSet<Map.Entry<K, V>>(new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {
+                int res = e1.getValue().compareTo(e2.getValue());
+                return res != 0 ? res : 1;
+            }
+        });
+        sortedEntries.addAll(map.entrySet());
+        return sortedEntries;
     }
 }

@@ -187,8 +187,8 @@ public class EvaluationExecutor {
 
         // run EvaluationResultcalculator
         EvaluationResultCalculator evaluationResultCalculator = new EvaluationResultCalculator();
-        evaluationResultCalculator.calculate(filesToEvaluate,
-                new File(foldTargetDirectory + File.separator + evaluationName + "-results.txt"), null, "O");
+        evaluationResultCalculator.calculate(filesToEvaluate, foldTargetDirectory, evaluationName + "-results.tsv",
+                null);
         org.apache.commons.io.FileUtils.deleteDirectory(tmpFoldDir);
     }
 
