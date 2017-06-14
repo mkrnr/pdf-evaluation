@@ -71,61 +71,61 @@ Examples for possible parameter lists can be found in the [amsd2017](https://git
 
 The folder containing the annotated files for training has the following structure:
 
-annotated
-├── reference-segmenter
-│   ├── raw
-│   │   ├── <fileid1>.training.referenceSegmenter
-│   │   ├── <fileid2>.training.referenceSegmenter
-│   │   └── ...
-│   ├── tei
-│   │   ├── <fileid1>.training.referenceSegmenter.tei.xml
-│   │   ├── <fileid2>.training.referenceSegmenter.tei.xml
-│   │   └── ...
-│   └── txt
-│       ├── <fileid1>.training.referenceSegmenter.rawtxt
-│       ├── <fileid2>.training.referenceSegmenter.rawtxt
-│       └── ...
-└── segmentation
-    ├── raw
-    │   ├── <fileid1>.training.segmentation
-    │   ├── <fileid2>.training.segmentation
-    │   └── ...
-    ├── tei
-    │   ├── <fileid1>.training.segmentation.tei.xml
-    │   ├── <fileid2>.training.segmentation.tei.xml
-    │   └── ...
-    └── txt
-        ├── <fileid1>.training.segmentation.rawtxt
-        ├── <fileid2>.training.segmentation.rawtxt
-        └── ...
+    annotated
+    ├── reference-segmenter
+    │   ├── raw
+    │   │   ├── <fileid1>.training.referenceSegmenter
+    │   │   ├── <fileid2>.training.referenceSegmenter
+    │   │   └── ...
+    │   ├── tei
+    │   │   ├── <fileid1>.training.referenceSegmenter.tei.xml
+    │   │   ├── <fileid2>.training.referenceSegmenter.tei.xml
+    │   │   └── ...
+    │   └── txt
+    │       ├── <fileid1>.training.referenceSegmenter.rawtxt
+    │       ├── <fileid2>.training.referenceSegmenter.rawtxt
+    │       └── ...
+    └── segmentation
+        ├── raw
+        │   ├── <fileid1>.training.segmentation
+        │   ├── <fileid2>.training.segmentation
+        │   └── ...
+        ├── tei
+        │   ├── <fileid1>.training.segmentation.tei.xml
+        │   ├── <fileid2>.training.segmentation.tei.xml
+        │   └── ...
+        └── txt
+            ├── <fileid1>.training.segmentation.rawtxt
+            ├── <fileid2>.training.segmentation.rawtxt
+            └── ...
 
 The folder containing the trained models has the following structure:
 
-models
-├── reference-segmenter
-│   └── model.wapiti
-└── segmentation
-    └── model.wapiti
+    models
+    ├── reference-segmenter
+    │   └── model.wapiti
+    └── segmentation
+        └── model.wapiti
 
 #### CERMINE
 
 The folder containing the annotated files for training has the following structure:
 
-annotated
-├── <file1>.cermstr
-├── <file2>.cermstr
-└── ...
+    annotated
+    ├── <file1>.cermstr
+    ├── <file2>.cermstr
+    └── ...
 
 The folder containing the trained models has the following structure:
 
-models
-├── cermine.properties
-├── model-body
-├── model-body.range
-├── model-category
-├── model-category.range
-├── model-metadata
-└── model-metadata.range
+    models
+    ├── cermine.properties
+    ├── model-body
+    ├── model-body.range
+    ├── model-category
+    ├── model-category.range
+    ├── model-metadata
+    └── model-metadata.range
 
 Note: The cermine.properties file currently contains absolute paths. Thereby, when moving the folder, these paths need to be updated as well.
 
@@ -133,10 +133,10 @@ Note: The cermine.properties file currently contains absolute paths. Thereby, wh
 
 The folder containing the annotated files for training has the following structure:
 
-annotated
-├── <fileid1>.csv
-├── <fileid2>.csv
-└── ...
+    annotated
+    ├── <fileid1>.csv
+    ├── <fileid2>.csv
+    └── ...
 
 The csv files contain the following columns in this order:
 
@@ -153,16 +153,16 @@ Note: this format can be changed by updating the following class in the refext p
 
 The folder containing the trained models has the following structure:
 
-models
-└── model.ser
+    models
+    └── model.ser
 
 #### ParsCit
 
 The folder containing the annotated files for training has the following structure:
 
-annotated
-├── <fileid1>.csv
-├── <fileid2>.csv
-└── ...
+    annotated
+    ├── <fileid1>.csv
+    ├── <fileid2>.csv
+    └── ...
 
 There is no training involved with ParsCit. It is just important that there is a functioning `citeExtract.pl` available that can be executed via the command line.
