@@ -41,10 +41,11 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
             List<ReferenceLineAnnotation> annotatedLines = crfReferenceLineAnnotator.annotate(layoutLines);
 
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile));
-            for (ReferenceLineAnnotation annotatedLine : annotatedLines) {
-                if (annotatedLine.getBestAnnotation().equals("B-REF")
-                        || annotatedLine.getBestAnnotation().equals("I-REF")) {
-                    bufferedWriter.write(annotatedLine.getBestAnnotation() + "\t" + annotatedLine);
+            for (ReferenceLineAnnotation referenceLineAnnotation : annotatedLines) {
+                if (referenceLineAnnotation.getBestAnnotation().equals("B-REF")
+                        || referenceLineAnnotation.getBestAnnotation().equals("I-REF")) {
+                    bufferedWriter.write(
+                            referenceLineAnnotation.getBestAnnotation() + "\t" + referenceLineAnnotation.getLine());
                     bufferedWriter.newLine();
                 }
             }
@@ -67,10 +68,11 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
 
             List<String> layoutLines = cermineLineLayoutExtractor.extract(pdfFile);
             List<ReferenceLineAnnotation> annotatedLines = crfReferenceLineAnnotator.annotate(layoutLines);
-            for (ReferenceLineAnnotation annotatedLine : annotatedLines) {
-                if (annotatedLine.getBestAnnotation().equals("B-REF")
-                        || annotatedLine.getBestAnnotation().equals("I-REF")) {
-                    annotatedReferenceLines.add(annotatedLine.getBestAnnotation() + "\t" + annotatedLine);
+            for (ReferenceLineAnnotation referenceLineAnnotation : annotatedLines) {
+                if (referenceLineAnnotation.getBestAnnotation().equals("B-REF")
+                        || referenceLineAnnotation.getBestAnnotation().equals("I-REF")) {
+                    annotatedReferenceLines.add(
+                            referenceLineAnnotation.getBestAnnotation() + "\t" + referenceLineAnnotation.getLine());
                 }
             }
         } catch (AnalysisException e) {
