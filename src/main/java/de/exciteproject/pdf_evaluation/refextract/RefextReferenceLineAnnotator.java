@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.exciteproject.refext.extract.CermineLineLayoutExtractor;
-import de.exciteproject.refext.extract.CrfReferenceLineAnnotator;
+import de.exciteproject.refext.extract.ReferenceLineAnnotation;
 import pl.edu.icm.cermine.ComponentConfiguration;
 import pl.edu.icm.cermine.exception.AnalysisException;
 
@@ -23,7 +23,8 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
             outputDir.mkdirs();
         }
 
-        CrfReferenceLineAnnotator crfReferenceLineAnnotator = new CrfReferenceLineAnnotator(modelFile);
+        de.exciteproject.refext.extract.ReferenceLineAnnotator crfReferenceLineAnnotator = new de.exciteproject.refext.extract.ReferenceLineAnnotator(
+                modelFile);
 
         ComponentConfiguration componentConfiguration = new ComponentConfiguration();
         CermineLineLayoutExtractor cermineLineLayoutExtractor = new CermineLineLayoutExtractor(componentConfiguration);
@@ -37,12 +38,13 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
             }
 
             List<String> layoutLines = cermineLineLayoutExtractor.extract(inputFile);
-            List<String> annotatedLines = crfReferenceLineAnnotator.annotate(layoutLines);
+            List<ReferenceLineAnnotation> annotatedLines = crfReferenceLineAnnotator.annotate(layoutLines);
 
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile));
-            for (String annotatedLine : annotatedLines) {
-                if (annotatedLine.startsWith("B-REF") || annotatedLine.startsWith("I-REF")) {
-                    bufferedWriter.write(annotatedLine);
+            for (ReferenceLineAnnotation annotatedLine : annotatedLines) {
+                if (annotatedLine.getBestAnnotation().equals("B-REF")
+                        || annotatedLine.getBestAnnotation().equals("I-REF")) {
+                    bufferedWriter.write(annotatedLine.getBestAnnotation() + "\t" + annotatedLine);
                     bufferedWriter.newLine();
                 }
             }
@@ -56,17 +58,19 @@ public class RefextReferenceLineAnnotator extends ReferenceLineAnnotator {
     public List<String> annotateReferenceLinesFromPDF(File pdfFile) throws IOException {
         List<String> annotatedReferenceLines = new ArrayList<String>();
         try {
-            CrfReferenceLineAnnotator crfReferenceLineAnnotator = new CrfReferenceLineAnnotator(this.modelFile);
+            de.exciteproject.refext.extract.ReferenceLineAnnotator crfReferenceLineAnnotator = new de.exciteproject.refext.extract.ReferenceLineAnnotator(
+                    this.modelFile);
 
             ComponentConfiguration componentConfiguration = new ComponentConfiguration();
             CermineLineLayoutExtractor cermineLineLayoutExtractor = new CermineLineLayoutExtractor(
                     componentConfiguration);
 
             List<String> layoutLines = cermineLineLayoutExtractor.extract(pdfFile);
-            List<String> annotatedLines = crfReferenceLineAnnotator.annotate(layoutLines);
-            for (String annotatedLine : annotatedLines) {
-                if (annotatedLine.startsWith("B-REF") || annotatedLine.startsWith("I-REF")) {
-                    annotatedReferenceLines.add(annotatedLine);
+            List<ReferenceLineAnnotation> annotatedLines = crfReferenceLineAnnotator.annotate(layoutLines);
+            for (ReferenceLineAnnotation annotatedLine : annotatedLines) {
+                if (annotatedLine.getBestAnnotation().equals("B-REF")
+                        || annotatedLine.getBestAnnotation().equals("I-REF")) {
+                    annotatedReferenceLines.add(annotatedLine.getBestAnnotation() + "\t" + annotatedLine);
                 }
             }
         } catch (AnalysisException e) {
