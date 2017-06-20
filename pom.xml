@@ -37,7 +37,7 @@
     <dependency>
 	  <groupId>com.github.exciteproject</groupId>
 	  <artifactId>refext</artifactId>
-	  <version>63c46adc6c</version>
+	  <version>2df648c4b2</version>
 	</dependency>
 	<dependency>
       <groupId>com.cybozu.labs</groupId>
